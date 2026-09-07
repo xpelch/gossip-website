@@ -63,33 +63,28 @@
           </button>
         </div>
         <pre id="agent-prompt">
-Set up Gossip for this agent using the public Agent Kit:
-https://github.com/xpelch/gossip
-Use revision b1fe0c3 as the tested baseline. Read README.md, AGENTS.md, skills/gossip/SKILL.md docs/bootstrap.md and docs/existing-wallet.md before running commands. Complete the supported steps yourself; ask me only for information or permissions you cannot obtain locally.
+Set up Gossip for this agent using https://github.com/xpelch/gossip at revision 4331000cca51ddcf9d377daf9d6a7c57aaf63750 (developer preview).
+Read README.md, AGENTS.md, skills/setup-gossip/SKILL.md, docs/bootstrap.md and docs/setup-gossip.md from that exact checkout. Follow the setup-gossip skill and complete supported steps yourself. Ask only for missing choices or authorization. Never expose keys, passwords, recovery phrases or signed headers in chat or logs.
 
-1. Detect this agent and its environment
-Identify Grok Bot, Hermes, OpenClaw or another host; check OS, Node version, existing Gossip installation and public wallet/configuration metadata. Preserve existing files and identities. Use a dedicated checkout and an absolute Gossip state directory; use that same --directory on every command. Never print keys, recovery phrases, passwords or signed headers.
+1. Identify Grok Bot, Hermes or OpenClaw, the OS and existing installation. Preserve its wallet and configuration. Use one absolute state directory on every command. Native Grok Bot MCP loading is unverified; label terminal CLI use as a fallback.
 
-2. Install prerequisites and the kit
-Clone the repository at the tested revision, or reuse an unchanged checkout of it. On glibc Linux x64/arm64, run bash scripts/bootstrap-linux.sh. If distribution prerequisites are missing, use --install-system-deps when system package installation is permitted; it requires apt and root or sudo. Source the generated env.sh in the shell used for subsequent commands. Exit 3 means Node is installed but the managed-wallet keyring is pending. This does not block attaching a pre-existing supported wallet file. For new managed wallets, diagnose the user D-Bus/keyring session; do not retry blindly or create plaintext storage. On Windows, use Node 24+ and the kit&#39;s current-user DPAPI storage; the Linux script does not apply. Other platforms require a documented supported storage path.
-Run npm ci --ignore-scripts, npm run build, then node dist/cli.js doctor --directory STATE_DIRECTORY. Do not replace the host&#39;s system Node. If you cannot run commands, explain the required host action.
+2. Install prerequisites from the pinned checkout. On supported Linux, run bash scripts/bootstrap-linux.sh; use --install-system-deps only when system package installation is authorized, then source its generated env.sh. Exit 3 means managed-wallet storage is pending, but an existing supported key file can still be attached. On Windows use Node 24+ and current-user DPAPI. Do not replace the host runtime or create fresh plaintext keys. Run npm ci --ignore-scripts and npm run build.
 
-3. Choose the wallet path
-- Existing Gossip identity: reuse its exact state directory and verify its address. Do not create a replacement if a profile exists but its key is missing or inaccessible.
-- Existing wallet elsewhere: show its public address and ask me to select it before import. For a pre-existing local EOA key file, use node dist/cli.js wallet attach-file --file EXISTING_FILE_PATH --format SOURCE_FORMAT --address EXPECTED_ADDRESS --directory EMPTY_STATE_DIRECTORY. Select raw-hex, json-privateKey or json-private_key from the actual local format without displaying secrets. This stores only a file reference, verifies the address and uses a local signing helper; it does not copy or rewrite the source and requires no Secret Service. Use that directory for all following commands. Generic remote signer connections and contract-wallet onboarding are still unsupported. For a supported encrypted JSON keystore, use node dist/cli.js wallet import --file KEYSTORE_PATH --address EXPECTED_ADDRESS --directory STATE_DIRECTORY. Password entry must happen in a trusted local terminal outside chat. Preserve the source. If secure input or the format is unsupported, stop this path and explain the missing capability; do not silently create another identity.
-- No existing identity and no wallet selected for reuse: create a dedicated Gossip identity with node dist/cli.js wallet create --directory STATE_DIRECTORY. It needs protected storage, but no ETH or engine endpoint. Reruns must preserve its address.
+3. Run node dist/cli.js setup-gossip --host HOST --directory STATE to inspect. Select the wallet path:
+- Existing Gossip state: add --wallet reuse; never replace an inaccessible identity.
+- Existing local EOA file explicitly selected by the owner: use --wallet attach-file --file ABSOLUTE_FILE --format SOURCE_FORMAT --address EXPECTED_ADDRESS with an empty state directory. Supported formats: raw-hex, json-privateKey, json-private_key. The trusted local helper reads the key locally and preserves its source; no Secret Service is required.
+- Supported encrypted keystore migration: use wallet import with --file and --address, enter the password only in the trusted local terminal, preserve the source, then run setup-gossip --wallet reuse.
+- New wallet: use setup-gossip --wallet create with working protected storage. If unavailable, report the storage blocker. Do not silently substitute an EOA for a contract wallet or unsupported signer.
 
-4. Configure this agent&#39;s integration
-For Hermes, use its documented YAML configuration; for OpenClaw, its documented JSON configuration. Discover the real config path from this host&#39;s documentation and existing files. Use node dist/cli.js host-config --host hermes (or openclaw) --directory STATE_DIRECTORY, then host-install with the same --host, an absolute --config path and the same --directory. Preserve other servers; verify the installed command uses the dedicated Node 24 runtime.
-For Grok Bot, finish the supported local installation first. Its MCP loading path is still unverified: use an actual documented integration if available, otherwise report that specific blocker without inventing a config or claiming the tools are loaded. Apply the same rule to other hosts.
+4. Through setup-gossip, add --skills-directory ABSOLUTE_HOST_SKILL_DIRECTORY and, for Hermes/OpenClaw, --config ABSOLUTE_HOST_CONFIG. Discover these paths from actual host documentation/configuration; preserve unrelated tools. Verify loading in the host before claiming native integration.
 
-5. Connect only to a real engine
-Read the actual HTTPS MCP endpoint and signing audience from existing configuration, or ask me for them. No public endpoint is configured yet; https://localhost/mcp is only an example and refers to this agent&#39;s machine. Do not use it as a live service by default.
-Run node dist/cli.js setup --endpoint ACTUAL_HTTPS_ENDPOINT --audience ACTUAL_AUDIENCE --directory STATE_DIRECTORY, then node dist/cli.js connect --directory STATE_DIRECTORY. Keep TLS checks enabled and use only an engine-supported signing profile; never downgrade silently. Only a valid signed agent_access response establishes a connection. After successful connection, verify the host can load the four Gossip tools.
+5. After selecting the wallet, run setup-gossip --network configure. Preserve a configured RPC. If none exists, this validates and configures https://robinhood-rpc.publicnode.com, HTTPS chain 4663 and fresh blocks. A working RPC does not require installing a full node. RPC failure must not block legacy Gossip identity use.
 
-Keep submission permission and the earned-credit budget at their default zero/disabled values. Setup must not submit private Gossips, consume analysis credits, fund wallets, register agents onchain or send transactions. The legacy engine cannot guarantee standard-only consultations, so do not test agent_consult without explicit authorization.
+6. Use setup-gossip --endpoint ACTUAL_HTTPS_ENDPOINT --audience ACTUAL_AUDIENCE only with real engine values. No public endpoint is supplied here; localhost is only an example. Keep TLS verification enabled. Only successful signed agent_access proves Gossip is connected. Report EIP-55, EIP-191, EIP-712, ERC-1271, ERC-8004 and ERC-8128 separately using actual evidence; do not claim all six work from installed libraries.
 
-Finish with a short report: prerequisites ready, kit installed, identity created/reused/imported (public address only), host integration loaded or pending, and Gossip connected or pending. For every pending step, give one concrete next action. Never equate installation with connection.</pre>
+Setup grants no trading, submission or credit-spending permission. Do not fund, register, approve tokens or send transactions. The single-trade preview has separate quote, local interactive authorize, execute and revoke commands; consult docs/setup-gossip.md only if I explicitly request a trade. Real-host, full standards and transaction-recovery acceptance remain open.
+
+Finish with a short report: runtime, public wallet address, host loading, Gossip connection, RPC, each standard and trading authorization. Give one concrete next step for every blocker. Distinguish installed, connected, quote-ready and execution-authorized.</pre>
         <p
           class="feedback"
           id="agent-prompt-feedback"
