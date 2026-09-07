@@ -60,3 +60,8 @@ assets or production evidence. Essential content remains readable without JavaSc
 
 This repository contains the Gossip website only. The agent toolkit lives at https://github.com/xpelch/gossip. Extracted from xpelch/sherwood commit 63d12b323a927f2abb8e4b7b4af96c7cd74aa912. Historical design documents retain their original context. The setup-gossip expansion is specified in https://github.com/xpelch/gossip/issues/2 and is not yet a released capability.
 
+
+## Vercel hosting
+
+Import xpelch/gossip-website with the Other framework preset and repository root. The checked-in configuration runs the checks and publishes only public/, with the same security headers as the local preview. No environment variables are required. The local preview server is not deployed.
+
