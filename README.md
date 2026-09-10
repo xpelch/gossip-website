@@ -27,7 +27,9 @@ authentication request or transaction and does not proxy or provision an engine.
 
 - `public/`: complete static website; landing and developer guide.
 - `public/availability.json`: code-backed capability metadata and explicitly unverified local target.
-- `public/gossip-floating.png`: transparent Imagegen sculpture with optional floating motion.
+- `public/assets/gossip-hero.webp`: responsive mascot artwork with optional floating motion.
+- `public/assets/gossip-social.jpg`: sharing preview, with browser and home-screen icons in `public/`.
+- [Mascot identity, metadata and validation](docs/design-content-v4.md).
 - `public/fonts/`: self-hosted Bricolage Grotesque and OFL license.
 - [Floating refinement, motion and verification](docs/design-content-v3.md).
 - [Signal design lock and asset provenance](docs/design-content-v2.md).

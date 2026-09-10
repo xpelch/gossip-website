@@ -6,8 +6,129 @@ import { once } from "node:events";
 
 const root = new URL("./public/", import.meta.url);
 const pages = ["index.html", "connect.html"];
+const canonicalOrigin = "https://gossip-website.vercel.app";
+const canonicalPages = [
+  {
+    file: "index.html",
+    path: "/",
+    title: "Gossip — Good intel travels.",
+    description:
+      "Gossip connects AI agents to onchain intelligence. Ask better questions, contribute private observations and earn deeper analysis. Powered by Sherwood.",
+  },
+  {
+    file: "connect.html",
+    path: "/connect.html",
+    title: "Connect your agent — Gossip",
+    description:
+      "Connect your AI agent to Gossip. Local MCP target, wallet signing contract, private contributions and earned intelligence access.",
+  },
+];
+const previewFiles = [
+  ["/", "text/html"],
+  ["/connect.html", "text/html"],
+  ["/styles.css", "text/css"],
+  ["/guide.js", "text/javascript"],
+  ["/availability.json", "application/json"],
+  ["/site.webmanifest", "application/manifest+json"],
+  ["/robots.txt", "text/plain"],
+  ["/sitemap.xml", "application/xml"],
+  ["/gossip-mark.svg", "image/svg+xml"],
+  ["/gossip-signal.png", "image/png"],
+  ["/gossip-floating.png", "image/png"],
+  ["/assets/gossip-social.jpg", "image/jpeg"],
+  ["/assets/gossip-hero.webp", "image/webp"],
+  ["/assets/gossip-hero-small.webp", "image/webp"],
+  ["/favicon.ico", "image/x-icon"],
+  ["/favicon-32.png", "image/png"],
+  ["/apple-touch-icon.png", "image/png"],
+  ["/icon-192.png", "image/png"],
+  ["/icon-512.png", "image/png"],
+  ["/fonts/bricolage-grotesque.ttf", "font/ttf"],
+];
+const textMimeTypes = new Set([
+  "text/html",
+  "text/css",
+  "text/javascript",
+  "text/plain",
+  "application/json",
+  "application/manifest+json",
+  "application/xml",
+  "image/svg+xml",
+]);
+const expectedContentSecurityPolicy =
+  "default-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+
 async function readPublic(name) {
   return readFile(new URL(name, root), "utf8");
+}
+
+function getAttribute(tag, name) {
+  const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*(["'])(.*?)\\1`, "i"));
+  return match?.[2] ?? null;
+}
+
+function getMetaContent(html, name) {
+  const tags = html.match(/<meta\b[^>]*>/gi) ?? [];
+  const tag = tags.find((candidate) => {
+    const property = getAttribute(candidate, "property");
+    const named = getAttribute(candidate, "name");
+    return property === name || named === name;
+  });
+  return tag ? getAttribute(tag, "content") : null;
+}
+
+function getLinkHref(html, rel) {
+  return getLinkHrefs(html, rel)[0] ?? null;
+}
+
+function getLinkHrefs(html, rel) {
+  const tags = html.match(/<link\b[^>]*>/gi) ?? [];
+  return tags
+    .filter((candidate) =>
+      (getAttribute(candidate, "rel") ?? "")
+        .toLowerCase()
+        .split(/\s+/)
+        .includes(rel),
+    )
+    .map((candidate) => getAttribute(candidate, "href"))
+    .filter((href) => href !== null);
+}
+
+function resolvePublicPath(href, pagePath) {
+  return new URL(href, `${canonicalOrigin}${pagePath}`).pathname;
+}
+
+function readPngDimensions(image) {
+  assert.equal(image.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+  assert.equal(image.subarray(12, 16).toString("ascii"), "IHDR");
+  return { width: image.readUInt32BE(16), height: image.readUInt32BE(20) };
+}
+
+function readJpegDimensions(image) {
+  assert.equal(image.subarray(0, 2).toString("hex"), "ffd8");
+  let offset = 2;
+  while (offset + 9 < image.length) {
+    if (image[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+
+    const marker = image[offset + 1];
+    offset += 2;
+    if (marker === 0xd8 || marker === 0xd9) {
+      continue;
+    }
+
+    const segmentLength = image.readUInt16BE(offset);
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return {
+        height: image.readUInt16BE(offset + 3),
+        width: image.readUInt16BE(offset + 5),
+      };
+    }
+    offset += segmentLength;
+  }
+  assert.fail("JPEG dimensions are missing");
 }
 
 test("Gossip availability is local development metadata powered by Sherwood", async () => {
@@ -43,23 +164,166 @@ test("Gossip availability is local development metadata powered by Sherwood", as
   assert.match(guide, /no public\s+deployment is configured/i);
 });
 
+test("canonical pages expose the required sharing and install metadata", async () => {
+  for (const page of canonicalPages) {
+    const html = await readPublic(page.file);
+    const canonicalUrl = `${canonicalOrigin}${page.path}`;
+
+    assert.equal(getLinkHref(html, "canonical"), canonicalUrl);
+    assert.equal(getMetaContent(html, "description"), page.description);
+    assert.equal(getMetaContent(html, "theme-color"), "#11100f");
+    assert.equal(
+      html.match(/<title\b[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim(),
+      page.title,
+    );
+
+    for (const [property, expected] of [
+      ["og:title", page.title],
+      ["og:description", page.description],
+      ["og:url", canonicalUrl],
+      ["og:type", "website"],
+      ["og:site_name", "Gossip"],
+      ["og:locale", "en_US"],
+      ["og:image", `${canonicalOrigin}/assets/gossip-social.jpg`],
+      ["og:image:secure_url", `${canonicalOrigin}/assets/gossip-social.jpg`],
+      ["og:image:type", "image/jpeg"],
+      ["og:image:width", "1200"],
+      ["og:image:height", "630"],
+    ]) {
+      assert.equal(
+        getMetaContent(html, property),
+        expected,
+        `${page.file}: ${property}`,
+      );
+    }
+    assert.ok(
+      getMetaContent(html, "og:image:alt"),
+      `${page.file}: og:image:alt`,
+    );
+
+    for (const [name, expected] of [
+      ["twitter:card", "summary_large_image"],
+      ["twitter:title", page.title],
+      ["twitter:description", page.description],
+      ["twitter:image", `${canonicalOrigin}/assets/gossip-social.jpg`],
+    ]) {
+      assert.equal(
+        getMetaContent(html, name),
+        expected,
+        `${page.file}: ${name}`,
+      );
+    }
+    assert.ok(
+      getMetaContent(html, "twitter:image:alt"),
+      `${page.file}: twitter:image:alt`,
+    );
+
+    for (const [rel, expected] of [
+      ["icon", "/favicon.ico"],
+      ["apple-touch-icon", "/apple-touch-icon.png"],
+      ["manifest", "/site.webmanifest"],
+    ]) {
+      const href = getLinkHref(html, rel);
+      assert.ok(href, `${page.file}: ${rel} link is missing`);
+      assert.equal(
+        resolvePublicPath(href, page.path),
+        expected,
+        `${page.file}: ${rel}`,
+      );
+    }
+    assert.deepEqual(
+      getLinkHrefs(html, "icon")
+        .map((href) => resolvePublicPath(href, page.path))
+        .sort(),
+      ["/favicon-32.png", "/favicon.ico", "/gossip-mark.svg"].sort(),
+      `${page.file}: favicon links`,
+    );
+  }
+});
+
+test("metadata files contain the canonical crawl and install contracts", async () => {
+  const manifest = JSON.parse(await readPublic("site.webmanifest"));
+  assert.equal(manifest.name, "Gossip");
+  assert.equal(manifest.short_name, "Gossip");
+  assert.equal(manifest.start_url, "/");
+  assert.equal(manifest.scope, "/");
+  assert.equal(manifest.display, "browser");
+  assert.equal(manifest.background_color, "#11100f");
+  assert.equal(manifest.theme_color, "#11100f");
+  assert.deepEqual(manifest.icons, [
+    {
+      src: "/icon-192.png",
+      sizes: "192x192",
+      type: "image/png",
+      purpose: "any",
+    },
+    {
+      src: "/icon-512.png",
+      sizes: "512x512",
+      type: "image/png",
+      purpose: "any",
+    },
+  ]);
+  assert.doesNotMatch(JSON.stringify(manifest), /maskable/i);
+
+  const robots = await readPublic("robots.txt");
+  assert.match(robots, /^User-agent:\s*\*\s*$/m);
+  assert.match(robots, /^Allow:\s*\/\s*$/m);
+  assert.match(
+    robots,
+    /^Sitemap:\s*https:\/\/gossip-website\.vercel\.app\/sitemap\.xml\s*$/m,
+  );
+
+  const sitemap = await readPublic("sitemap.xml");
+  const locations = [...sitemap.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(locations, [
+    `${canonicalOrigin}/`,
+    `${canonicalOrigin}/connect.html`,
+  ]);
+  assert.equal(locations.length, 2);
+  assert.equal((sitemap.match(/<url\b/g) ?? []).length, 2);
+});
+
+test("new public assets have expected signatures and dimensions", async () => {
+  const pngAssets = [
+    ["favicon-32.png", 32, 32],
+    ["apple-touch-icon.png", 180, 180],
+    ["icon-192.png", 192, 192],
+    ["icon-512.png", 512, 512],
+  ];
+  for (const [name, width, height] of pngAssets) {
+    const dimensions = readPngDimensions(await readFile(new URL(name, root)));
+    assert.deepEqual(dimensions, { width, height }, name);
+  }
+
+  const socialImage = await readFile(new URL("assets/gossip-social.jpg", root));
+  assert.deepEqual(readJpegDimensions(socialImage), {
+    width: 1200,
+    height: 630,
+  });
+  for (const name of [
+    "assets/gossip-hero.webp",
+    "assets/gossip-hero-small.webp",
+  ]) {
+    const image = await readFile(new URL(name, root));
+    assert.equal(image.subarray(0, 4).toString("ascii"), "RIFF", name);
+    assert.equal(image.subarray(8, 12).toString("ascii"), "WEBP", name);
+  }
+
+  const favicon = await readFile(new URL("favicon.ico", root));
+  assert.equal(favicon.readUInt16LE(0), 0);
+  assert.equal(favicon.readUInt16LE(2), 1);
+});
+
 test("public pages contain no intake or private route and internal links resolve", async () => {
   const htmlByPage = Object.fromEntries(
     await Promise.all(
       pages.map(async (page) => [page, await readPublic(page)]),
     ),
   );
-  const files = new Set([
-    "/",
-    "/connect.html",
-    "/styles.css",
-    "/guide.js",
-    "/availability.json",
-    "/gossip-mark.svg",
-    "/gossip-signal.png",
-    "/gossip-floating.png",
-    "/fonts/bricolage-grotesque.ttf",
-  ]);
+  const files = new Set(previewFiles.map(([path]) => path));
   for (const [page, html] of Object.entries(htmlByPage)) {
     assert.doesNotMatch(
       html,
@@ -96,30 +360,31 @@ test("preview serves only the public allowlist with restrictive headers", async 
   try {
     const [chunk] = await once(child.stdout, "data");
     const url = String(chunk).match(/http:\/\/127\.0\.0\.1:\d+/)[0];
-    for (const path of [
-      "/",
-      "/connect.html",
-      "/styles.css",
-      "/guide.js",
-      "/availability.json",
-      "/gossip-mark.svg",
-      "/gossip-signal.png",
-      "/gossip-floating.png",
-      "/fonts/bricolage-grotesque.ttf",
-    ]) {
+    for (const [path, expectedType] of previewFiles) {
       const response = await fetch(url + path);
       assert.equal(response.status, 200, path);
+      const expectedContentType = textMimeTypes.has(expectedType)
+        ? `${expectedType}; charset=utf-8`
+        : expectedType;
+      assert.equal(
+        response.headers.get("content-type"),
+        expectedContentType,
+        path,
+      );
       assert.equal(response.headers.get("cache-control"), "no-store");
-      assert.match(
+      assert.equal(
         response.headers.get("content-security-policy"),
-        /connect-src 'none'/,
+        expectedContentSecurityPolicy,
       );
       assert.equal(response.headers.get("x-content-type-options"), "nosniff");
+      assert.equal(response.headers.get("referrer-policy"), "no-referrer");
     }
     for (const path of [
       "/server.mjs",
       "/.env",
       "/%2e%2e/README.md",
+      "/assets/%2e%2e/server.mjs",
+      "/assets/..%2fserver.mjs",
       "/mcp",
       "/intake",
       "/private",
@@ -150,10 +415,16 @@ test("guide script has no network, credential, or storage behavior", async () =>
   assert.doesNotMatch(script, /privateKey|seedPhrase|password|credential/i);
 });
 
-test("floating sculpture has alpha and the display font is self-hosted", async () => {
-  const image = await readFile(new URL("gossip-floating.png", root));
-  assert.equal(image.subarray(1, 4).toString(), "PNG");
-  assert.equal(image[25], 6, "sculpture must retain its RGBA channel");
+test("hero uses responsive mascot artwork and the display font is self-hosted", async () => {
+  const home = await readPublic("index.html");
+  assert.match(home, /src="assets\/gossip-hero\.webp"/);
+  const sourceSet = home.match(/srcset="([^"]+)"/)?.[1];
+  assert.equal(
+    sourceSet?.trim().replace(/\s+/g, " "),
+    "assets/gossip-hero-small.webp 768w, assets/gossip-hero.webp 1536w",
+  );
+  assert.doesNotMatch(home, /gossip-floating\.png|gossip-signal\.png/);
+
   const font = await readFile(new URL("fonts/bricolage-grotesque.ttf", root));
   assert.equal(font.readUInt32BE(0), 0x00010000);
   assert.match(await readPublic("fonts/OFL.txt"), /SIL OPEN FONT LICENSE/);

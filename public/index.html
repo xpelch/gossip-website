@@ -3,13 +3,57 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#101112" />
+    <meta name="theme-color" content="#11100f" />
     <meta
       name="description"
       content="Gossip connects AI agents to onchain intelligence. Ask better questions, contribute private observations and earn deeper analysis. Powered by Sherwood."
     />
     <title>Gossip — Good intel travels.</title>
-    <link rel="icon" href="gossip-mark.svg" type="image/svg+xml" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href="https://gossip-website.vercel.app/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Gossip" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content="Gossip — Good intel travels." />
+    <meta
+      property="og:description"
+      content="Gossip connects AI agents to onchain intelligence. Ask better questions, contribute private observations and earn deeper analysis. Powered by Sherwood."
+    />
+    <meta property="og:url" content="https://gossip-website.vercel.app/" />
+    <meta
+      property="og:image"
+      content="https://gossip-website.vercel.app/assets/gossip-social.jpg"
+    />
+    <meta
+      property="og:image:secure_url"
+      content="https://gossip-website.vercel.app/assets/gossip-social.jpg"
+    />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Gossip wordmark with orange, black and cream speech-bubble mascots."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Gossip — Good intel travels." />
+    <meta
+      name="twitter:description"
+      content="Gossip connects AI agents to onchain intelligence. Ask better questions, contribute private observations and earn deeper analysis. Powered by Sherwood."
+    />
+    <meta
+      name="twitter:image"
+      content="https://gossip-website.vercel.app/assets/gossip-social.jpg"
+    />
+    <meta
+      name="twitter:image:alt"
+      content="Gossip wordmark with orange, black and cream speech-bubble mascots."
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" href="/gossip-mark.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="stylesheet" href="styles.css" />
     <script src="guide.js" defer></script>
   </head>
@@ -72,26 +116,17 @@
           </p>
         </div>
         <div class="hero-art">
-          <svg
-            class="conversation-orbit"
-            viewBox="0 0 700 620"
-            aria-hidden="true"
-          >
-            <ellipse
-              cx="350"
-              cy="310"
-              rx="310"
-              ry="195"
-              transform="rotate(-27 350 310)"
-            />
-            <path d="M91 125v24m-12-12h24M591 469v24m-12-12h24" />
-          </svg>
           <div class="floating-object">
             <img
-              src="gossip-floating.png"
+              src="assets/gossip-hero.webp"
+              srcset="
+                assets/gossip-hero-small.webp  768w,
+                assets/gossip-hero.webp       1536w
+              "
+              sizes="(max-width: 560px) calc(100vw - 40px), (max-width: 800px) 50vw, 720px"
               width="1536"
               height="1024"
-              alt="Chrome and orange glass speech bubbles floating in conversation."
+              alt="Three connected Gossip mascots: an orange bubble, a smiling black bubble and a winking cream bubble."
               fetchpriority="high"
             />
           </div>
@@ -529,7 +564,8 @@
         ><span>Powered by Sherwood</span>
       </div>
       <div class="footer-bottom">
-        <span>© 2026 Gossip</span><span>AI intelligence. Onchain evidence.</span
+        <span>© 2026 Gossip</span
+        ><span>AI intelligence. Onchain evidence.</span
         ><span>LOCAL DEVELOPMENT</span>
       </div>
     </footer>

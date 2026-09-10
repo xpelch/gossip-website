@@ -8,13 +8,37 @@ const files = new Map([
   ["/styles.css", ["styles.css", "text/css"]],
   ["/guide.js", ["guide.js", "text/javascript"]],
   ["/availability.json", ["availability.json", "application/json"]],
+  ["/site.webmanifest", ["site.webmanifest", "application/manifest+json"]],
+  ["/robots.txt", ["robots.txt", "text/plain"]],
+  ["/sitemap.xml", ["sitemap.xml", "application/xml"]],
   ["/gossip-mark.svg", ["gossip-mark.svg", "image/svg+xml"]],
   ["/gossip-signal.png", ["gossip-signal.png", "image/png"]],
   ["/gossip-floating.png", ["gossip-floating.png", "image/png"]],
+  ["/assets/gossip-social.jpg", ["assets/gossip-social.jpg", "image/jpeg"]],
+  ["/assets/gossip-hero.webp", ["assets/gossip-hero.webp", "image/webp"]],
+  [
+    "/assets/gossip-hero-small.webp",
+    ["assets/gossip-hero-small.webp", "image/webp"],
+  ],
+  ["/favicon.ico", ["favicon.ico", "image/x-icon"]],
+  ["/favicon-32.png", ["favicon-32.png", "image/png"]],
+  ["/apple-touch-icon.png", ["apple-touch-icon.png", "image/png"]],
+  ["/icon-192.png", ["icon-192.png", "image/png"]],
+  ["/icon-512.png", ["icon-512.png", "image/png"]],
   [
     "/fonts/bricolage-grotesque.ttf",
     ["fonts/bricolage-grotesque.ttf", "font/ttf"],
   ],
+]);
+const textMimeTypes = new Set([
+  "text/html",
+  "text/css",
+  "text/javascript",
+  "text/plain",
+  "application/json",
+  "application/manifest+json",
+  "application/xml",
+  "image/svg+xml",
 ]);
 const port = Number(process.env.PORT || 43848);
 const server = createServer(async (request, response) => {
@@ -32,7 +56,10 @@ const server = createServer(async (request, response) => {
   }
   try {
     const content = await readFile(new URL(file[0], publicRoot));
-    response.writeHead(200, { "Content-Type": `${file[1]}; charset=utf-8` });
+    const contentType = textMimeTypes.has(file[1])
+      ? `${file[1]}; charset=utf-8`
+      : file[1];
+    response.writeHead(200, { "Content-Type": contentType });
     response.end(request.method === "HEAD" ? undefined : content);
   } catch {
     response.writeHead(500).end("Page unavailable");
