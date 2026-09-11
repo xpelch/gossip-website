@@ -8,7 +8,7 @@ const root = new URL("./public/", import.meta.url);
 const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
 const agentKitRepository = "https://github.com/gossip-dev/gossip";
-const agentKitRevision = "ef6f6e88eb29c31314d70f8d425739c7b9510ffe";
+const agentKitRevision = "067ee0ffc0753bdd0e408931576059075c8cdaf7";
 const canonicalPages = [
   {
     file: "index.html",
