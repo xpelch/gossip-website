@@ -7,6 +7,8 @@ import { once } from "node:events";
 const root = new URL("./public/", import.meta.url);
 const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
+const agentKitRepository = "https://github.com/gossip-dev/gossip";
+const agentKitRevision = "ef6f6e88eb29c31314d70f8d425739c7b9510ffe";
 const canonicalPages = [
   {
     file: "index.html",
@@ -162,6 +164,16 @@ test("Gossip availability is local development metadata powered by Sherwood", as
   assert.equal(record.chain_id, availability.chainId);
   assert.match(guide, /EOA personal_sign/i);
   assert.match(guide, /no public\s+deployment is configured/i);
+});
+
+test("installation prompt pins the canonical Gossip agent kit", async () => {
+  const guide = await readPublic("connect.html");
+
+  assert.match(
+    guide,
+    new RegExp(`${agentKitRepository} at revision ${agentKitRevision}`),
+  );
+  assert.doesNotMatch(guide, /github\.com\/xpelch\/gossip\b/i);
 });
 
 test("canonical pages expose the required sharing and install metadata", async () => {
