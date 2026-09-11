@@ -65,5 +65,5 @@ This repository contains the Gossip website only. The agent toolkit lives at htt
 
 ## Vercel hosting
 
-Import xpelch/gossip-website with the Other framework preset and repository root. The checked-in configuration runs the checks and publishes only public/, with the same security headers as the local preview. No environment variables are required. The local preview server is not deployed.
+Import this repository with the Other framework preset and repository root. The checked-in configuration runs the checks and publishes only public/, with the same security headers as the local preview. No environment variables are required. The local preview server is not deployed.
 

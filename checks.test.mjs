@@ -173,7 +173,23 @@ test("installation prompt pins the canonical Gossip agent kit", async () => {
     guide,
     new RegExp(`${agentKitRepository} at revision ${agentKitRevision}`),
   );
-  assert.doesNotMatch(guide, /github\.com\/xpelch\/gossip\b/i);
+});
+
+test("public GitHub links stay within the canonical Gossip repository", async () => {
+  for (const page of canonicalPages) {
+    const html = await readPublic(page.file);
+    const githubLinks = [
+      ...html.matchAll(/href="(https:\/\/github\.com\/[^\"]+)"/gi),
+    ].map((match) => match[1]);
+
+    for (const link of githubLinks) {
+      assert.ok(
+        link === agentKitRepository ||
+          link.startsWith(`${agentKitRepository}/`),
+        `${page.file} links outside the canonical Gossip repository: ${link}`,
+      );
+    }
+  }
 });
 
 test("canonical pages expose the required sharing and install metadata", async () => {

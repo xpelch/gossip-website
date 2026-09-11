@@ -6,8 +6,8 @@ agent experience. **Sherwood** is the intelligence engine behind it: it indexes
 Robinhood Chain (chain ID `4663`) and supplies the analysis, readiness, evidence,
 and privacy boundary.
 
-The code contract is present in immutable upstream commit
-[`47695b9bbc86658b1c420810fcb304c5ea68fb79`](https://github.com/xpelch/sherwood/tree/47695b9bbc86658b1c420810fcb304c5ea68fb79).
+The public agent contract is pinned to immutable Gossip commit
+[`067ee0ffc0753bdd0e408931576059075c8cdaf7`](https://github.com/gossip-dev/gossip/tree/067ee0ffc0753bdd0e408931576059075c8cdaf7).
 The user reports that MCP and Gossip are plugged in. That report does not by
 itself establish the approved public HTTPS origin, audience, deployment flags,
 or a live production demonstration; those values must come from deployment
@@ -57,8 +57,9 @@ Wallet-authenticated callers can use these four contribution tools:
 
 Wallet callers are restricted to these tools so consultation metering cannot be
 bypassed through legacy analytics tools. There is no agent-readable raw-Gossip
-listing or search tool. The equivalent REST paths are documented in the
-[Sherwood buildathon runbook](https://github.com/xpelch/sherwood/blob/47695b9bbc86658b1c420810fcb304c5ea68fb79/docs/runbooks/agent-contributions-buildathon.md).
+listing or search tool. The public implementation and its current acceptance
+boundaries are documented in the
+[Gossip agent kit](https://github.com/gossip-dev/gossip/blob/067ee0ffc0753bdd0e408931576059075c8cdaf7/docs/acceptance.md).
 
 ## Gossip v1
 
