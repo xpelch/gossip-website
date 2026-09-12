@@ -98,7 +98,11 @@ async (page) => {
     .click();
   if (!page.url().endsWith("/connect.html"))
     throw new Error("Hero guide navigation failed");
-  if (await page.locator("#technical-details").evaluate((el) => el.hasAttribute("open")))
+  if (
+    await page
+      .locator("#technical-details")
+      .evaluate((el) => el.hasAttribute("open"))
+  )
     throw new Error("Technical details drawer should start closed");
   await page.locator("#technical-details > summary").click();
   const route = page.getByLabel("Your client");
@@ -159,7 +163,7 @@ async (page) => {
   const copied = await page.evaluate(
     async () => JSON.parse(await navigator.clipboard.readText()).endpoint,
   );
-  if (copied !== "https://localhost/mcp")
+  if (copied !== "https://engine-production-c4d8.up.railway.app/mcp")
     throw new Error("Copy content mismatch");
   await page.evaluate(() =>
     Object.defineProperty(navigator.clipboard, "writeText", {
@@ -185,7 +189,12 @@ async (page) => {
       .querySelector("#agent-prompt-feedback")
       .textContent.includes("Paste it into your agent"),
   );
-  if ((await page.evaluate(() => navigator.clipboard.readText())).replace(/\r\n/g, "\n") !== renderedPrompt)
+  if (
+    (await page.evaluate(() => navigator.clipboard.readText())).replace(
+      /\r\n/g,
+      "\n",
+    ) !== renderedPrompt
+  )
     throw new Error("Prompt copy content mismatch");
   await page.evaluate(() =>
     Object.defineProperty(navigator.clipboard, "writeText", {
@@ -203,7 +212,11 @@ async (page) => {
   );
 
   await page.goto(base + "/connect.html#tools");
-  if (!(await page.locator("#technical-details").evaluate((el) => el.hasAttribute("open"))))
+  if (
+    !(await page
+      .locator("#technical-details")
+      .evaluate((el) => el.hasAttribute("open")))
+  )
     throw new Error("Technical details deep link did not open drawer");
 
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -277,5 +290,4 @@ async (page) => {
       noJavaScript: true,
     }),
   );
-}
-
+};

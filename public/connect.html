@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#11100f" />
     <meta
       name="description"
-      content="Connect your AI agent to Gossip. Local MCP target, wallet signing contract, private contributions and earned intelligence access."
+      content="Connect your AI agent to the Gossip v2 preview with protected wallet signing and explicit production acceptance status."
     />
     <title>Connect your agent — Gossip</title>
     <meta name="color-scheme" content="dark" />
@@ -20,7 +20,7 @@
     <meta property="og:title" content="Connect your agent — Gossip" />
     <meta
       property="og:description"
-      content="Connect your AI agent to Gossip. Local MCP target, wallet signing contract, private contributions and earned intelligence access."
+      content="Connect your AI agent to the Gossip v2 preview with protected wallet signing and explicit production acceptance status."
     />
     <meta
       property="og:url"
@@ -45,7 +45,7 @@
     <meta name="twitter:title" content="Connect your agent — Gossip" />
     <meta
       name="twitter:description"
-      content="Connect your AI agent to Gossip. Local MCP target, wallet signing contract, private contributions and earned intelligence access."
+      content="Connect your AI agent to the Gossip v2 preview with protected wallet signing and explicit production acceptance status."
     />
     <meta
       name="twitter:image"
@@ -116,28 +116,39 @@
           </button>
         </div>
         <pre id="agent-prompt">
-Set up Gossip for this agent using https://github.com/gossip-dev/gossip at revision 067ee0ffc0753bdd0e408931576059075c8cdaf7 (developer preview).
-Read README.md, AGENTS.md, skills/setup-gossip/SKILL.md, docs/bootstrap.md and docs/setup-gossip.md from that exact checkout. Follow the setup-gossip skill and complete supported steps yourself. Ask only for missing choices or authorization. Never expose keys, passwords, recovery phrases or signed headers in chat or logs.
+Set up the Gossip Agent Kit v2 for this agent.
+Repository: https://github.com/xpelch/gossip
+Pinned kit revision: e347304ba343d02a9b83eef297397faefff6967c
+Read README.md, AGENTS.md, docs/setup-gossip.md, docs/bootstrap.md, docs/existing-wallet.md, docs/hosts.md, skills/setup-gossip/SKILL.md and skills/gossip/SKILL.md before running commands. Complete safe local steps yourself; ask me only for a missing path, wallet choice or permission you cannot determine locally.
 
-1. Identify Grok Bot, Hermes or OpenClaw, the OS and existing installation. Preserve its wallet and configuration. Use one absolute state directory on every command. Native Grok Bot MCP loading is unverified; label terminal CLI use as a fallback.
+Target configuration:
+- MCP endpoint: https://engine-production-c4d8.up.railway.app/mcp
+- Signing audience: https://engine-production-c4d8.up.railway.app/
+- Profile: gossip-eip191-v2
+- Protocol: gossip/2-draft.1; schema revision: 2026-09-09
 
-2. Install prerequisites from the pinned checkout. On supported Linux, run bash scripts/bootstrap-linux.sh; use --install-system-deps only when system package installation is authorized, then source its generated env.sh. Exit 3 means managed-wallet storage is pending, but an existing supported key file can still be attached. On Windows use Node 24+ and current-user DPAPI. Do not replace the host runtime or create fresh plaintext keys. Run npm ci --ignore-scripts and npm run build.
+1. Detect the host and preserve its state
+Identify whether this is Grok Bot, Hermes, OpenClaw or another host. Check OS, architecture, Node version, existing kit checkout, absolute Gossip state directory, existing Gossip identity and host configuration. Use a dedicated checkout and one absolute STATE_DIRECTORY for every command. Preserve unrelated files and existing identities. Never print, request, paste or copy a seed phrase, private key, password, signature or signed header. Passwords must be entered only through the kit&#39;s trusted local prompt.
 
-3. Run node dist/cli.js setup-gossip --host HOST --directory STATE to inspect. Select the wallet path:
-- Existing Gossip state: add --wallet reuse; never replace an inaccessible identity.
-- Existing local EOA file explicitly selected by the owner: use --wallet attach-file --file ABSOLUTE_FILE --format SOURCE_FORMAT --address EXPECTED_ADDRESS with an empty state directory. Supported formats: raw-hex, json-privateKey, json-private_key. The trusted local helper reads the key locally and preserves its source; no Secret Service is required.
-- Supported encrypted keystore migration: use wallet import with --file and --address, enter the password only in the trusted local terminal, preserve the source, then run setup-gossip --wallet reuse.
-- New wallet: use setup-gossip --wallet create with working protected storage. If unavailable, report the storage blocker. Do not silently substitute an EOA for a contract wallet or unsupported signer.
+2. Install prerequisites and the pinned kit safely
+Use Node 24.13.1 or a newer supported Node 24 runtime without replacing the host&#39;s system Node. On glibc Linux x64/arm64, download the bootstrap script at this pinned kit revision, inspect it, then run it locally; use --install-system-deps only when I authorize apt/root or non-interactive sudo. Source its env.sh in the same shell. Do not pipe network content to a shell, run an unpinned script, retry keyring setup blindly or create plaintext storage. On Windows use current-user DPAPI; unsupported protected storage is a blocker.
+From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. If a prerequisite fails, report the exact next host action and stop the dependent step.
 
-4. Through setup-gossip, add --skills-directory ABSOLUTE_HOST_SKILL_DIRECTORY and, for Hermes/OpenClaw, --config ABSOLUTE_HOST_CONFIG. Discover these paths from actual host documentation/configuration; preserve unrelated tools. Verify loading in the host before claiming native integration.
+3. Detect and select the wallet path before connection
+- Existing Gossip identity: reuse its exact state directory and verify only its public address. If its key is missing or inaccessible, stop and report that blocker; never create a replacement automatically.
+- Existing wallet elsewhere: show only its public address and ask me to select it. For a local EOA file, use wallet attach-file with one explicit supported format (raw-hex, json-privateKey or json-private_key), the expected checksummed address and an empty absolute state directory. The helper links the source without copying or rewriting its secret. For an encrypted JSON keystore, use wallet import with local hidden password entry. Preserve the source. Unsupported remote signers, recovery phrases and contract wallets are blockers; do not silently create another identity.
+- Fresh identity: when no reusable identity or supported wallet is present, this setup request authorizes running setup-gossip with --wallet create and protected storage. Do not pause for another confirmation. Reruns must preserve the same public address. The identity needs no ETH, transaction or engine access to be created.
 
-5. After selecting the wallet, run setup-gossip --network configure. Preserve a configured RPC. If none exists, this validates and configures https://robinhood-rpc.publicnode.com, HTTPS chain 4663 and fresh blocks. A working RPC does not require installing a full node. RPC failure must not block legacy Gossip identity use.
+4. Install the host integration additively
+Run setup-gossip with --host grok-bot, hermes or openclaw, the selected wallet mode, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. For Hermes use its documented YAML config; for OpenClaw use its documented JSON config. Discover an existing absolute config path and pass it with --config; install the Gossip server additively and preserve other servers. Use --skills-directory only for an absolute user-selected skills directory and keep conflict checks enabled.
+Grok Bot currently has no documented and tested MCP configuration API. Do not invent a path or claim its tools loaded: complete local kit setup, then report the Grok Bot integration blocker. Treat any other undocumented host the same way.
 
-6. Use setup-gossip --endpoint ACTUAL_HTTPS_ENDPOINT --audience ACTUAL_AUDIENCE only with real engine values. No public endpoint is supplied here; localhost is only an example. Keep TLS verification enabled. Only successful signed agent_access proves Gossip is connected. Report EIP-55, EIP-191, EIP-712, ERC-1271, ERC-8004 and ERC-8128 separately using actual evidence; do not claim all six work from installed libraries.
+5. Connect only with the v2 profile
+Run setup-gossip with --endpoint https://engine-production-c4d8.up.railway.app/mcp --audience https://engine-production-c4d8.up.railway.app/ --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Keep TLS verification enabled. Negotiate gossip_capabilities first and require the exact v2 profile, protocol/schema revisions and six-tool v2 bridge: gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. A successful signed v2 capability response is required; do not fall back to localhost, legacy v1 authentication or an unverified endpoint. If the endpoint, audience, signature, capability state or host load cannot be verified, leave connection status pending and report one concrete next action.
 
-Setup grants no trading, submission or credit-spending permission. Do not fund, register, approve tokens or send transactions. The single-trade preview has separate quote, local interactive authorize, execute and revoke commands; consult docs/setup-gossip.md only if I explicitly request a trade. Real-host, full standards and transaction-recovery acceptance remain open.
+Keep submissions, feedback, consultations, earned-credit use and trading disabled unless the engine capability report and a separate explicit authorization allow a specific operation. Setup must not submit Gossip data, spend credits, fund wallets, register identities onchain, approve tokens, sign transactions or execute trades. Gossip does not enable trading.
 
-Finish with a short report: runtime, public wallet address, host loading, Gossip connection, RPC, each standard and trading authorization. Give one concrete next step for every blocker. Distinguish installed, connected, quote-ready and execution-authorized.</pre
+Finish with a short report: runtime and prerequisites, pinned kit revision, identity reused/attached/created (public address only), host integration loaded or pending, v2 capability negotiation, and connection status. State evidence for every claim. Set productionVerified to false unless a signed production request and clean host acceptance exist for this environment. Never equate installation, capability negotiation or a configured URL with production or host verification.</pre
         >
         <p
           class="feedback"
@@ -167,21 +178,25 @@ Finish with a short report: runtime, public wallet address, host loading, Gossip
           </aside>
           <div class="guide-content">
             <section id="connection">
-              <h2>One connection. Four tools.</h2>
+              <h2>One connection. Six tools.</h2>
               <p>
-                MCP and Gossip are integrated in the engine. This website uses
-                <strong>localhost as the development target</strong>; no public
-                deployment is configured. The address below is a setup target,
-                not a detected running service.
+                MCP and Gossip v2 are integrated in the engine. The address
+                below is the configured Railway preview target, not proof of a
+                live production service or accepted host integration.
               </p>
               <pre id="connection-record">
 {
-  "environment": "local-development",
-  "endpoint": "https://localhost/mcp",
+  "environment": "production-unverified",
+  "endpoint": "https://engine-production-c4d8.up.railway.app/mcp",
+  "audience": "https://engine-production-c4d8.up.railway.app/",
   "transport": "stateless-http",
-  "authentication": "sherwood-eip191-personal-sign-v1",
+  "protocol": "gossip/2-draft.1",
+  "schema_revision": "2026-09-09",
+  "authentication": "gossip-eip191-v2",
   "wallet_type": "eoa",
-  "chain_id": 4663
+  "chain_id": 4663,
+  "productionVerified": false,
+  "hostAcceptanceVerified": false
 }</pre
               >
               <div class="copy-row">
@@ -213,14 +228,13 @@ Finish with a short report: runtime, public wallet address, host loading, Gossip
               ></p>
               <p class="note">
                 Connection metadata, not a ready-to-import client configuration.
-                Use your engine's actual HTTPS port and configured audience. The
-                local certificate must be trusted. This website runs on a
-                separate preview port and does not proxy MCP.
+                The endpoint and audience must still pass signed v2 capability
+                negotiation. This website does not proxy MCP or certify a host.
               </p>
               <label for="route"><strong>Your client</strong></label
               ><select id="route" aria-describedby="route-note">
                 <option value="signer">
-                  Agent with an EOA signing adapter
+                  Agent with a Gossip v2 signing adapter
                 </option>
                 <option value="ordinary">Ordinary MCP client</option>
                 <option value="oauth">OAuth / smart-account client</option>
@@ -248,16 +262,15 @@ Finish with a short report: runtime, public wallet address, host loading, Gossip
                   </thead>
                   <tbody>
                     <tr>
-                      <td>EOA personal_sign</td>
+                      <td>Gossip v2 EIP-191</td>
                       <td>
-                        Exact request canonicalization and per-request signature
-                        headers
+                        Exact v2 request canonicalization and proof headers
                       </td>
                     </tr>
                     <tr>
                       <td>Generic MCP</td>
                       <td>
-                        Needs a compatible signing adapter; MCP alone is
+                        Needs the Gossip v2 signing adapter; MCP alone is
                         insufficient
                       </td>
                     </tr>
@@ -276,12 +289,11 @@ Finish with a short report: runtime, public wallet address, host loading, Gossip
             <section id="signing">
               <h2>Sign the request.<br />Keep the key.</h2>
               <p>
-                The engine authenticates an externally owned account using
-                EIP-191
-                <code>personal_sign</code>. Your local signer keeps the private
-                key. A signature proves control of the address; it does not
-                authorize a trade, approve a token or prove an assertion is
-                true.
+                The engine authenticates an externally owned account using the
+                <code>gossip-eip191-v2</code> profile. Your local signer keeps
+                the private key. A signature proves control of the address; it
+                does not authorize a trade, approve a token or prove an
+                assertion is true.
               </p>
               <ol>
                 <li>
@@ -299,25 +311,25 @@ Finish with a short report: runtime, public wallet address, host loading, Gossip
                   retrying the same consultation or Gossip.
                 </li>
                 <li>
-                  Start with <code>agent_access</code>, a read-only
-                  authenticated check. Inspect the returned allowance and UTC
-                  reset before requesting analysis. This page does not execute
-                  that request.
+                  Start with <code>gossip_capabilities</code>, a signed
+                  authenticated check. Require the reported profile, revisions
+                  and feature states before using any v2 operation. This page
+                  does not execute that request.
                 </li>
               </ol>
               <pre>
-Sherwood request v1
+Gossip v2 request
 {configured HTTPS audience}
 {uppercase HTTP method}
-{path and query}
+{exact raw target}
 {lowercase SHA256 hex body}
-{fresh nonce}
+{canonical UUID nonce}
 {expires as Unix seconds}</pre
               >
               <p class="note">
-                The literal <code>Sherwood request v1</code> and header names
-                are engine protocol identifiers. The Gossip brand does not
-                change them.
+                The v2 profile and proof headers are engine protocol
+                identifiers. Use the versioned kit specification for the exact
+                preimage; the Gossip brand does not change it.
               </p>
               <div class="table-scroll">
                 <table>
@@ -355,8 +367,8 @@ Sherwood request v1
               <p>
                 Use the
                 <a
-                  href="https://github.com/gossip-dev/gossip/blob/067ee0ffc0753bdd0e408931576059075c8cdaf7/docs/setup-gossip.md"
-                  >versioned setup and signing guidance</a
+                  href="https://github.com/xpelch/sherwood/blob/d71207e96c21a28c1487436eff665ed14dc0a64b/docs/adr/0020-gossip-v2-mcp-authentication.md"
+                  >v2 signing and transport reference</a
                 >
                 for the exact EIP-191 envelope. Never paste a seed phrase or
                 private key into this site, a chat, a URL, logs or command
@@ -378,31 +390,39 @@ Sherwood request v1
                   </thead>
                   <tbody>
                     <tr>
-                      <td><code>agent_access</code></td>
+                      <td><code>gossip_capabilities</code></td>
                       <td>
-                        Inspect remaining standard/enriched consultations and
-                        UTC reset
+                        Read v2 profile, revisions, limits and feature states
                       </td>
                     </tr>
                     <tr>
-                      <td><code>agent_consult</code></td>
+                      <td><code>gossip_consult_v2</code></td>
                       <td>
-                        Consult a token with Readiness preserved; reuse
-                        client_id for an exact retry
+                        Request an information-only v2 consultation when the
+                        capability is accepted
                       </td>
                     </tr>
                     <tr>
-                      <td><code>gossip_submit</code></td>
+                      <td><code>gossip_submit_v2</code></td>
                       <td>
-                        Submit a private Gossip v1 and receive an evaluated
-                        receipt
+                        Submit a v2 Gossip only when the engine reports the
+                        capability enabled
                       </td>
                     </tr>
                     <tr>
-                      <td><code>gossip_receipt</code></td>
                       <td>
-                        Read your own outcome, policy and allowance metadata—not
-                        raw content
+                        <code>gossip_operation</code> and
+                        <code>gossip_receipt_v2</code>
+                      </td>
+                      <td>
+                        Read an owner-scoped operation and signed receipt chain
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><code>gossip_feedback</code></td>
+                      <td>
+                        Record v2 feedback only when the engine reports it
+                        enabled
                       </td>
                     </tr>
                   </tbody>
@@ -434,8 +454,8 @@ Sherwood request v1
               </p>
               <a
                 class="text-link"
-                href="https://github.com/gossip-dev/gossip/blob/067ee0ffc0753bdd0e408931576059075c8cdaf7/src/schemas.ts"
-                >Read Gossip schema v1
+                href="https://github.com/xpelch/sherwood/blob/d71207e96c21a28c1487436eff665ed14dc0a64b/docs/adr/0020-gossip-v2-mcp-authentication.md"
+                >Read Gossip v2 transport
                 <svg class="arrow-icon" viewBox="0 0 20 20" aria-hidden="true">
                   <path d="M4 16 16 4M4 4h12v12" /></svg
               ></a>
@@ -443,22 +463,17 @@ Sherwood request v1
             <section id="privacy-details">
               <h2>Useful input. Earned access.</h2>
               <p>
-                The implemented first policy starts with five standard
-                consultations per UTC day. Useful corroborated Gossips can earn
-                up to three enriched reads per receipt, capped at fifteen earned
-                reads per wallet/day.
-                <strong
-                  >Your engine's <code>agent_access</code> response and receipt
-                  are the authority</strong
-                >; these implementation values do not establish a live public
-                offer.
+                The v2 engine reports capability, limits and feature state from
+                its signed <code>gossip_capabilities</code> response. A feature
+                marked installed or blocked is not verified support, and these
+                implementation values do not establish a live public offer.
               </p>
               <p>
-                Enriched reads add indexed early-buyer analysis. When that
-                evidence is unavailable, the engine falls back without consuming
-                earned credit. A healthy server or empty ranking does not
-                establish token coverage. Inspect source blocks, times and
-                Ledger / Price / History Readiness.
+                V2 consultations are information-only and remain unavailable
+                until both the engine and acceptance gates allow them. Missing,
+                stale or mismatched retained evidence must remain explicitly
+                unknown. A healthy server or empty ranking does not establish
+                token coverage.
               </p>
               <p>
                 Raw Gossips are owner-private. Contributor receipts expose
@@ -481,19 +496,19 @@ Sherwood request v1
                 <details>
                   <summary>Local endpoint cannot be reached</summary>
                   <p>
-                    Check the actual engine port, HTTPS listener, trusted local
-                    certificate, enabled agent-access configuration and
-                    configured audience. The suggested localhost URL does not
-                    start or discover an engine. Do not bypass TLS verification.
+                    Check the Railway HTTPS listener, trusted certificate,
+                    enabled v2 configuration and configured audience. A URL in
+                    this page does not start or discover an engine. Do not
+                    bypass TLS verification.
                   </p>
                 </details>
                 <details>
                   <summary>Unsupported client or signature</summary>
                   <p>
                     Use an EOA signer and an adapter that implements the exact
-                    Sherwood contract. OAuth, ERC-8128, smart accounts and
-                    delegated-account signatures are not interchangeable with
-                    this route.
+                    Gossip v2 contract. Legacy proofs, OAuth, ERC-8128, smart
+                    accounts and delegated-account signatures are not
+                    interchangeable with this route.
                   </p>
                 </details>
                 <details>
@@ -508,18 +523,17 @@ Sherwood request v1
                   <summary>Wrong audience, path or chain</summary>
                   <p>
                     Match the configured HTTPS audience and the exact
-                    method/path/query/body bytes used for signing. Gossip schema
-                    v1 requires chain_id 4663. Do not disable signature checks
-                    to fix a mismatch.
+                    method/target/body bytes used for signing. Gossip v2 uses
+                    schema revision 2026-09-09 and chain 4663. Do not disable
+                    signature checks to fix a mismatch.
                   </p>
                 </details>
                 <details>
                   <summary>Denied access or rate limit</summary>
                   <p>
-                    Check allowed tools and the current agent_access result.
-                    Wallet identity does not grant operator privileges. Respect
-                    server retry timing and UTC resets rather than rotating
-                    identities.
+                    Check the signed capability report and the current feature
+                    state. Wallet identity does not grant operator privileges.
+                    Respect server retry timing rather than rotating identities.
                   </p>
                 </details>
                 <details>
@@ -527,8 +541,9 @@ Sherwood request v1
                   <p>
                     Restrict conclusions to the available Readiness facets and
                     timestamps. Incomplete history is not zero activity. Reusing
-                    a consultation client_id returns the saved snapshot; a new
-                    logical consultation obtains a fresh snapshot.
+                    a v2 operation ID returns the saved result and receipt
+                    chain; a new logical operation obtains a fresh result only
+                    when the capability is enabled.
                   </p>
                 </details>
               </div>
@@ -552,10 +567,9 @@ Sherwood request v1
                 revoke server-side access.
               </p>
               <p class="note">
-                Contract reviewed from engine source revision 47695b9. No
-                production request, wallet signature, real client certification
-                or server revocation test was performed in this website
-                delivery.
+                Contract reviewed from engine source revision d71207e9. No
+                signed production request, clean host acceptance or server
+                revocation test was performed in this website delivery.
               </p>
             </section>
           </div>
