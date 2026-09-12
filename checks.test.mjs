@@ -7,8 +7,9 @@ import { once } from "node:events";
 const root = new URL("./public/", import.meta.url);
 const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
-const agentKitRepository = "https://github.com/gossip-dev/gossip";
-const agentKitRevision = "067ee0ffc0753bdd0e408931576059075c8cdaf7";
+const agentKitRepository = "https://github.com/xpelch/gossip";
+const engineRepository = "https://github.com/xpelch/sherwood";
+const agentKitRevision = "e347304ba343d02a9b83eef297397faefff6967c";
 const canonicalPages = [
   {
     file: "index.html",
@@ -22,7 +23,7 @@ const canonicalPages = [
     path: "/connect.html",
     title: "Connect your agent — Gossip",
     description:
-      "Connect your AI agent to Gossip. Local MCP target, wallet signing contract, private contributions and earned intelligence access.",
+      "Connect your AI agent to the Gossip v2 preview with protected wallet signing and explicit production acceptance status.",
   },
 ];
 const previewFiles = [
@@ -133,23 +134,36 @@ function readJpegDimensions(image) {
   assert.fail("JPEG dimensions are missing");
 }
 
-test("Gossip availability is local development metadata powered by Sherwood", async () => {
+test("Gossip availability exposes the unverified v2 preview contract", async () => {
   const availability = JSON.parse(await readPublic("availability.json"));
   assert.equal(availability.brand, "Gossip");
   assert.equal(availability.engine, "Sherwood");
-  assert.equal(availability.status, "local-development");
-  assert.equal(availability.endpoint, null);
+  assert.equal(availability.status, "production-unverified");
+  assert.equal(
+    availability.endpoint,
+    "https://engine-production-c4d8.up.railway.app/mcp",
+  );
+  assert.equal(
+    availability.audience,
+    "https://engine-production-c4d8.up.railway.app/",
+  );
   assert.equal(availability.productionVerified, false);
-  assert.equal(availability.developmentTarget, "https://localhost/mcp");
+  assert.equal(availability.hostAcceptanceVerified, false);
+  assert.equal(availability.developmentTarget, null);
   assert.equal(availability.developmentTargetVerified, false);
-  assert.equal(availability.authentication, "sherwood-eip191-personal-sign-v1");
+  assert.equal(availability.protocol, "gossip/2-draft.1");
+  assert.equal(availability.schemaRevision, "2026-09-09");
+  assert.equal(availability.mcpRevision, "2025-11-25");
+  assert.equal(availability.authentication, "gossip-eip191-v2");
   assert.equal(availability.walletType, "eoa");
   assert.equal(availability.chainId, 4663);
   assert.deepEqual(availability.tools, [
-    "agent_access",
-    "agent_consult",
-    "gossip_submit",
-    "gossip_receipt",
+    "gossip_capabilities",
+    "gossip_consult_v2",
+    "gossip_submit_v2",
+    "gossip_operation",
+    "gossip_receipt_v2",
+    "gossip_feedback",
   ]);
   const guide = await readPublic("connect.html");
   const recordMatch = guide.match(
@@ -157,21 +171,51 @@ test("Gossip availability is local development metadata powered by Sherwood", as
   );
   assert.ok(recordMatch, "guide connection record is missing");
   const record = JSON.parse(recordMatch[1]);
-  assert.equal(record.endpoint, availability.developmentTarget);
+  assert.equal(record.endpoint, availability.endpoint);
+  assert.equal(record.audience, availability.audience);
   assert.equal(record.transport, availability.transport);
+  assert.equal(record.protocol, availability.protocol);
+  assert.equal(record.schema_revision, availability.schemaRevision);
   assert.equal(record.authentication, availability.authentication);
   assert.equal(record.wallet_type, availability.walletType);
   assert.equal(record.chain_id, availability.chainId);
-  assert.match(guide, /EOA personal_sign/i);
-  assert.match(guide, /no public\s+deployment is configured/i);
+  assert.equal(record.productionVerified, false);
+  assert.equal(record.hostAcceptanceVerified, false);
+  assert.match(guide, /gossip-eip191-v2/i);
+  assert.match(guide, /production\s+acceptance/i);
 });
 
-test("installation prompt pins the canonical Gossip agent kit", async () => {
+test("installation prompt pins the safe Gossip v2 host and wallet flow", async () => {
   const guide = await readPublic("connect.html");
+  const promptMatch = guide.match(
+    /<pre id="agent-prompt">([\s\S]*?)<\/pre\s*>/,
+  );
+  assert.ok(promptMatch, "agent setup prompt is missing");
+  const prompt = promptMatch[1];
 
+  assert.match(prompt, new RegExp(`Repository: ${agentKitRepository}`));
+  assert.match(prompt, new RegExp(`Pinned kit revision: ${agentKitRevision}`));
+  assert.match(prompt, /Grok Bot, Hermes, OpenClaw/u);
+  assert.match(prompt, /Existing Gossip identity/u);
+  assert.match(prompt, /Existing wallet elsewhere/u);
+  assert.match(prompt, /Fresh identity/u);
+  assert.match(prompt, /Do not pause for another confirmation/u);
+  assert.match(prompt, /--profile gossip-eip191-v2/u);
+  assert.match(prompt, /gossip\/2-draft\.1/u);
+  assert.match(prompt, /gossip_capabilities/u);
+  assert.match(prompt, /six-tool v2 bridge/u);
   assert.match(
-    guide,
-    new RegExp(`${agentKitRepository} at revision ${agentKitRevision}`),
+    prompt,
+    /never print, request, paste or copy a seed phrase, private key/iu,
+  );
+  assert.match(prompt, /Gossip does not enable trading/u);
+  assert.match(
+    prompt,
+    /productionVerified to false unless a signed production request and clean host acceptance/u,
+  );
+  assert.doesNotMatch(
+    prompt,
+    /067ee0|sherwood-eip191-personal-sign-v1|https:\/\/localhost\/mcp|only after I approve/u,
   );
 });
 
@@ -185,8 +229,10 @@ test("public GitHub links stay within the canonical Gossip repository", async ()
     for (const link of githubLinks) {
       assert.ok(
         link === agentKitRepository ||
-          link.startsWith(`${agentKitRepository}/`),
-        `${page.file} links outside the canonical Gossip repository: ${link}`,
+          link.startsWith(`${agentKitRepository}/`) ||
+          link === engineRepository ||
+          link.startsWith(`${engineRepository}/`),
+        `${page.file} links outside the Gossip and Sherwood repositories: ${link}`,
       );
     }
   }

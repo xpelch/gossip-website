@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.mjs",
     "check": "node --test checks.test.mjs"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
   }
 }
-
