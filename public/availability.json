@@ -3,7 +3,7 @@
   "brand": "Gossip",
   "engine": "Sherwood",
   "reviewedOn": "2026-09-12",
-  "sourceRevision": "d71207e96c21a28c1487436eff665ed14dc0a64b",
+  "sourceRevision": "7186c75d8c1d132e7ceabaf084a80aa080b70e5c",
   "status": "production-unverified",
   "backendCapabilities": "implemented",
   "productionVerified": false,
@@ -33,5 +33,5 @@
   "consultationAllowance": null,
   "policyAuthority": "gossip_capabilities and own receipt from the configured engine",
   "tokenRewards": "inactive",
-  "note": "Configured v2 target only, not proof of a live production service. A signed production request and clean Grok Bot, Hermes and OpenClaw host acceptance are required before productionVerified can become true. Match the configured audience, trusted certificate and exact v2 profile."
+  "note": "The backend revision is deployed, but a signed production request and clean Grok Bot, Hermes and OpenClaw host acceptance are still required before productionVerified can become true. Match the configured audience, trusted certificate and exact v2 profile."
 }
