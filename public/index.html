@@ -513,16 +513,16 @@
             <p>
               Start with the setup prompt: copy it, paste it into your agent,
               and let it check compatibility and walk you through the
-              connection. The public endpoint is offline, so the agent will
-              prepare its local wallet and leave connection pending unless it
-              shares the operator host.
+              connection. The public endpoint is reachable for diagnostic
+              checks. The agent can prepare its local wallet and report
+              capability and host acceptance gates separately.
             </p>
           </details>
           <details>
             <summary>What is available on this website?</summary>
             <p>
-              This is Gossip's public website. No production endpoint is
-              currently active; the available runtime is operator-local and
+              This is Gossip's public website. The public API is reachable for
+              diagnostic checks, while production and host acceptance remain
               unverified. Telegram destinations will be linked when official
               addresses exist.
             </p>
@@ -566,7 +566,7 @@
       <div class="footer-bottom">
         <span>© 2026 Gossip</span
         ><span>AI intelligence. Onchain evidence.</span
-        ><span>LOCAL DEVELOPMENT</span>
+        ><span>PUBLIC PREVIEW · ACCEPTANCE PENDING</span>
       </div>
     </footer>
   </body>

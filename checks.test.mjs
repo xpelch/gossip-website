@@ -142,9 +142,18 @@ test("Gossip availability exposes the local-only v2 boundary", async () => {
   assert.equal(availability.engine, "Sherwood");
   assert.equal(availability.agentKitRevision, agentKitRevision);
   assert.equal(availability.agentKitArtifactSha256, agentKitArtifactSha256);
-  assert.equal(availability.status, "local-development");
-  assert.equal(availability.endpoint, null);
-  assert.equal(availability.audience, null);
+  assert.equal(availability.status, "public-gateway-reachable");
+  assert.equal(availability.endpoint, "https://api.gossip-protocol.xyz/mcp");
+  assert.equal(
+    availability.capabilitiesEndpoint,
+    "https://api.gossip-protocol.xyz/v2/gossip/capabilities",
+  );
+  assert.equal(availability.audience, "https://api.gossip-protocol.xyz/");
+  assert.equal(
+    availability.sourceRevision,
+    "6d08cacab6b436c7574f8dfd5b5b8794eb302aeb",
+  );
+  assert.equal(availability.diagnosticVerifiedAt, "2026-09-13T03:16:23Z");
   assert.equal(availability.productionVerified, false);
   assert.equal(availability.hostAcceptanceVerified, false);
   assert.equal(availability.developmentTarget, "http://127.0.0.1:18080/mcp");
@@ -159,6 +168,34 @@ test("Gossip availability exposes the local-only v2 boundary", async () => {
   assert.equal(availability.authentication, "gossip-eip191-v2");
   assert.equal(availability.walletType, "eoa");
   assert.equal(availability.chainId, 4663);
+  assert.equal(availability.rpc, "https://robinhood-rpc.publicnode.com");
+  assert.deepEqual(availability.diagnosticChecks, {
+    capabilities: 200,
+    mcpInitialize: 200,
+    mcpToolsList: 200,
+    replay: 401,
+    invalidSignature: 401,
+    note: "Diagnostic only; tool listing is discovery only.",
+  });
+  assert.deepEqual(
+    Object.fromEntries(
+      availability.features.map(({ capability, status }) => [
+        capability,
+        status,
+      ]),
+    ),
+    {
+      http: "installed",
+      durable_operations: "installed",
+      atomic_consult: "blocked",
+      signed_receipts: "blocked",
+      evidence: "blocked",
+      public_submission: "blocked",
+      private_submission: "blocked",
+      session_keys: "not_applicable",
+      tasks: "not_applicable",
+    },
+  );
   assert.deepEqual(availability.tools, [
     "gossip_capabilities",
     "gossip_consult_v2",
@@ -196,7 +233,7 @@ test("Gossip availability exposes the local-only v2 boundary", async () => {
 test("installation prompt pins the safe Gossip v2 host and wallet flow", async () => {
   const guide = await readPublic("connect.html");
   const promptMatch = guide.match(
-    /<pre id="agent-prompt">([\s\S]*?)<\/pre\s*>/,
+    /<pre\s+id="agent-prompt"[^>]*>([\s\S]*?)<\/pre\s*>/,
   );
   assert.ok(promptMatch, "agent setup prompt is missing");
   const prompt = promptMatch[1];
@@ -204,7 +241,10 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
   assert.match(prompt, /Repository: https:\/\/gossip-protocol\.xyz\/gossip/u);
   assert.doesNotMatch(prompt, /xpelch/iu);
   assert.match(prompt, new RegExp(`Pinned kit revision: ${agentKitRevision}`));
-  assert.match(prompt, /Grok Bot, Hermes, OpenClaw/u);
+  assert.match(guide, /prompt-tab-general/u);
+  assert.match(guide, /prompt-tab-grok/u);
+  assert.match(guide, /prompt-tab-hermes/u);
+  assert.match(guide, /prompt-tab-openclaw/u);
   assert.match(prompt, /Existing Gossip identity/u);
   assert.match(prompt, /Existing wallet elsewhere/u);
   assert.match(prompt, /Fresh identity/u);
@@ -212,10 +252,24 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
   assert.match(prompt, /--profile gossip-eip191-v2/u);
   assert.match(prompt, /gossip\/2-draft\.1/u);
   assert.match(prompt, /gossip_capabilities/u);
-  assert.match(prompt, /six-tool v2 surface/u);
+  assert.match(
+    prompt,
+    /six-tool v2 surface|gossip_capabilities.*gossip_feedback/u,
+  );
   assert.match(prompt, /Respect each tool's reported capability state/u);
-  assert.match(prompt, /Public MCP endpoint: unavailable/u);
-  assert.match(prompt, /http:\/\/127\.0\.0\.1:18080\/mcp/u);
+  assert.match(
+    prompt,
+    /Public MCP endpoint: https:\/\/api\.gossip-protocol\.xyz\/mcp/u,
+  );
+  assert.match(
+    prompt,
+    /Capabilities endpoint: https:\/\/api\.gossip-protocol\.xyz\/v2\/gossip\/capabilities/u,
+  );
+  assert.match(
+    prompt,
+    /Exact signing audience: https:\/\/api\.gossip-protocol\.xyz\//u,
+  );
+  assert.match(prompt, /https:\/\/robinhood-rpc\.publicnode\.com/u);
   assert.match(
     prompt,
     /never print, request, paste or copy a seed phrase, private key/iu,
@@ -229,6 +283,29 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
     prompt,
     /067ee0|sherwood-eip191-personal-sign-v1|engine-production-c4d8|only after I approve/u,
   );
+});
+
+test("prompt tabs keep every host prompt readable without JavaScript", async () => {
+  const guide = await readPublic("connect.html");
+  const tabs = [...guide.matchAll(/<button\b[^>]*\brole="tab"[^>]*>/gu)];
+  assert.equal(tabs.length, 4);
+  for (const tab of tabs) {
+    assert.match(tab[0], /aria-selected="(?:true|false)"/u);
+    assert.match(tab[0], /tabindex="-?\d+"/u);
+    assert.match(tab[0], /aria-controls="[^"]+"/u);
+  }
+  for (const id of [
+    "agent-prompt",
+    "prompt-panel-grok",
+    "prompt-panel-hermes",
+    "prompt-panel-openclaw",
+  ]) {
+    const panel = guide.match(
+      new RegExp('<pre\\s+id="' + id + '"[^>]*>([\\s\\S]*?)<\\/pre', "u"),
+    );
+    assert.ok(panel?.[1].trim(), `${id} must be readable without JavaScript`);
+  }
+  assert.match(await readPublic("guide.js"), /activePromptPanel/u);
 });
 
 test("public GitHub links stay within the canonical Gossip repository", async () => {

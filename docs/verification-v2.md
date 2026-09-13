@@ -24,11 +24,15 @@ A Luna worker documented the contract; coordinator corrected the public-key byte
 wording and incorporated the user's localhost choice. Gossip is the public brand;
 Sherwood protocol strings and header names remain unchanged.
 
-At the time of this report, `https://localhost/mcp` was the explicitly
-unverified development target and no engine was authenticated. The site later
-published a Railway production candidate, but that endpoint is now offline. The
-current availability record publishes no production endpoint or audience and
-identifies the operator-local runtime as an unverified development target.
+The current availability record publishes the reachable endpoint
+`https://api.gossip-protocol.xyz/mcp`, capabilities endpoint
+`https://api.gossip-protocol.xyz/v2/gossip/capabilities`, and exact audience
+`https://api.gossip-protocol.xyz/`. Capabilities, MCP initialize and tools-list
+diagnostics returned 200; replay and invalid-signature diagnostics returned
+401. These outcomes do not verify production or a host. The record keeps
+`productionVerified` and `hostAcceptanceVerified` false, with HTTP and
+durable operations installed, consultations/receipts/evidence/submissions
+blocked, and session/tasks not applicable.
 
 ## Local checks
 

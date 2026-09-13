@@ -1626,7 +1626,44 @@ td code {
 .setup-heading .button {
   flex-shrink: 0;
 }
-#agent-prompt {
+.prompt-tabs {
+  display: flex;
+  gap: 4px;
+  margin-top: 30px;
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.prompt-tabs button {
+  flex: 0 0 auto;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 11px 16px 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.prompt-tabs button:hover,
+.prompt-tabs button[aria-selected="true"] {
+  color: var(--text);
+}
+.prompt-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--accent);
+}
+.prompt-tabs button:focus-visible {
+  outline-offset: -3px;
+}
+.prompt-panels {
+  min-width: 0;
+}
+.prompt-panels pre[hidden] {
+  display: none;
+}
+.prompt-panels pre[role="tabpanel"] {
+  margin-top: 24px;
+}
+.prompt-panels pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   max-height: 260px;
@@ -1668,7 +1705,14 @@ td code {
   .setup-heading .button {
     justify-content: center;
   }
-  #agent-prompt {
+  .prompt-tabs {
+    margin-top: 22px;
+  }
+  .prompt-tabs button {
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+  .prompt-panels pre {
     padding: 16px;
   }
   .technical-details > summary span {

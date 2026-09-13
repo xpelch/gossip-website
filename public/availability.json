@@ -3,15 +3,17 @@
   "brand": "Gossip",
   "engine": "Sherwood",
   "reviewedOn": "2026-09-13",
-  "sourceRevision": "db968f5010b9491b67190aff749d62f2ad0e7a97",
+  "sourceRevision": "6d08cacab6b436c7574f8dfd5b5b8794eb302aeb",
   "agentKitRevision": "ba360730e872534270ed54b3690a3c60b47c52cc",
   "agentKitArtifactSha256": "e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a",
-  "status": "local-development",
+  "status": "public-gateway-reachable",
+  "diagnosticVerifiedAt": "2026-09-13T03:16:23Z",
   "backendCapabilities": "implemented",
   "productionVerified": false,
   "hostAcceptanceVerified": false,
-  "endpoint": null,
-  "audience": null,
+  "endpoint": "https://api.gossip-protocol.xyz/mcp",
+  "capabilitiesEndpoint": "https://api.gossip-protocol.xyz/v2/gossip/capabilities",
+  "audience": "https://api.gossip-protocol.xyz/",
   "developmentTarget": "http://127.0.0.1:18080/mcp",
   "developmentTargetAudience": "http://127.0.0.1:18080/",
   "developmentTargetVerified": false,
@@ -22,6 +24,7 @@
   "authentication": "gossip-eip191-v2",
   "walletType": "eoa",
   "chainId": 4663,
+  "rpc": "https://robinhood-rpc.publicnode.com",
   "tools": [
     "gossip_capabilities",
     "gossip_consult_v2",
@@ -30,11 +33,75 @@
     "gossip_receipt_v2",
     "gossip_feedback"
   ],
+  "diagnosticChecks": {
+    "capabilities": 200,
+    "mcpInitialize": 200,
+    "mcpToolsList": 200,
+    "replay": 401,
+    "invalidSignature": 401,
+    "note": "Diagnostic only; tool listing is discovery only."
+  },
+  "features": [
+    {
+      "capability": "atomic_consult",
+      "status": "blocked",
+      "reason": "Consultation acceptance is not complete.",
+      "nextAction": "Run the pinned production consultation acceptance."
+    },
+    {
+      "capability": "durable_operations",
+      "status": "installed",
+      "reason": "The durable operation kernel is installed.",
+      "nextAction": "Run the version-pinned operation adapter acceptance."
+    },
+    {
+      "capability": "signed_receipts",
+      "status": "blocked",
+      "reason": "No approved receipt signer is configured.",
+      "nextAction": "Configure an approved secret-backed receipt signer, then run pinned receipt authenticity acceptance."
+    },
+    {
+      "capability": "evidence",
+      "status": "blocked",
+      "reason": "Evidence replay acceptance is not complete.",
+      "nextAction": "Run the pinned production evidence replay acceptance."
+    },
+    {
+      "capability": "session_keys",
+      "status": "not_applicable",
+      "reason": "Session keys are not negotiated by this deployment.",
+      "nextAction": "Enable and accept the version-pinned session adapter."
+    },
+    {
+      "capability": "public_submission",
+      "status": "blocked",
+      "reason": "Public submission acceptance is not complete.",
+      "nextAction": "Run the pinned public submission acceptance."
+    },
+    {
+      "capability": "private_submission",
+      "status": "blocked",
+      "reason": "Private submission remains disabled by policy.",
+      "nextAction": "Approve retention, privacy and owner-scoped submission policy."
+    },
+    {
+      "capability": "http",
+      "status": "installed",
+      "reason": "The authenticated public HTTP boundary is reachable.",
+      "nextAction": "Keep operation features gated by their own acceptance."
+    },
+    {
+      "capability": "tasks",
+      "status": "not_applicable",
+      "reason": "MCP Tasks are not negotiated by this deployment.",
+      "nextAction": "Negotiate the pinned MCP Tasks revision before enabling it."
+    }
+  ],
   "supportedClients": [],
   "telegramChannel": null,
   "telegramBot": null,
   "consultationAllowance": null,
   "policyAuthority": "gossip_capabilities and own receipt from the configured engine",
   "tokenRewards": "inactive",
-  "note": "The public Railway endpoint is offline. The operator-local Sherwood runtime is a development target only and is reachable solely from the same host. Production and host acceptance remain unverified."
+  "note": "The public HTTPS endpoint is reachable for diagnostic capabilities and MCP checks. Production and host acceptance remain unverified; tool listing is discovery only and blocked feature states remain blocked."
 }
