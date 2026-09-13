@@ -71,3 +71,7 @@ and real-host acceptance remain open release gates.
 ## Vercel hosting
 
 Import this repository with the Other framework preset and repository root. The checked-in configuration runs the checks and publishes only public/, with the same security headers as the local preview. No environment variables are required. The local preview server is not deployed.
+
+The setup prompt uses `https://gossip-protocol.xyz/gossip` as its repository URL.
+Vercel redirects this path and its subpaths to the existing agent kit repository,
+including Git discovery requests. This redirect is available on Vercel only.

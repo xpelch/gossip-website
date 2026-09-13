@@ -197,7 +197,8 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
   assert.ok(promptMatch, "agent setup prompt is missing");
   const prompt = promptMatch[1];
 
-  assert.match(prompt, new RegExp(`Repository: ${agentKitRepository}`));
+  assert.match(prompt, /Repository: https:\/\/gossip-protocol\.xyz\/gossip/u);
+  assert.doesNotMatch(prompt, /xpelch/iu);
   assert.match(prompt, new RegExp(`Pinned kit revision: ${agentKitRevision}`));
   assert.match(prompt, /Grok Bot, Hermes, OpenClaw/u);
   assert.match(prompt, /Existing Gossip identity/u);
