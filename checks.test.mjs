@@ -4,6 +4,8 @@ import { readFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
 
+import setupPrompt from "./api/setup-prompt.js";
+
 const root = new URL("./public/", import.meta.url);
 const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
@@ -59,7 +61,13 @@ const textMimeTypes = new Set([
   "image/svg+xml",
 ]);
 const expectedContentSecurityPolicy =
-  "default-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+  "default-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'";
+const protectedPromptFixture = {
+  general: "General protected setup prompt",
+  grok: "Grok Bot protected setup prompt",
+  hermes: "Hermes protected setup prompt",
+  openclaw: "OpenClaw protected setup prompt",
+};
 
 async function readPublic(name) {
   return readFile(new URL(name, root), "utf8");
@@ -95,6 +103,37 @@ function getLinkHrefs(html, rel) {
     )
     .map((candidate) => getAttribute(candidate, "href"))
     .filter((href) => href !== null);
+}
+
+function invokeSetupPrompt({ method = "POST", body } = {}) {
+  const headers = new Map();
+  const response = {
+    statusCode: 200,
+    body: null,
+    setHeader(name, value) {
+      headers.set(name.toLowerCase(), value);
+    },
+    status(statusCode) {
+      this.statusCode = statusCode;
+      return this;
+    },
+    json(value) {
+      this.body = value;
+    },
+  };
+
+  setupPrompt({ method, body }, response);
+
+  return { ...response, headers };
+}
+
+function restoreEnvironmentVariable(name, value) {
+  if (value === undefined) {
+    delete process.env[name];
+    return;
+  }
+
+  process.env[name] = value;
 }
 
 function resolvePublicPath(href, pagePath) {
@@ -258,65 +297,22 @@ test("Gossip availability exposes the reachable public v2 boundary", async () =>
   assert.match(guide, /production\s+acceptance/i);
 });
 
-test("installation prompt pins the safe Gossip v2 host and wallet flow", async () => {
+test("installation prompts stay out of the public page until unlocked", async () => {
   const guide = await readPublic("connect.html");
-  const promptMatch = guide.match(
-    /<pre\s+id="agent-prompt"[^>]*>([\s\S]*?)<\/pre\s*>/,
-  );
-  assert.ok(promptMatch, "agent setup prompt is missing");
-  const prompt = promptMatch[1];
 
-  assert.match(prompt, /Repository: https:\/\/gossip-protocol\.xyz\/gossip/u);
-  assert.doesNotMatch(prompt, /xpelch/iu);
-  assert.match(
-    prompt,
-    new RegExp(`Pinned public source commit: ${agentKitRevision}`),
-  );
   assert.match(guide, /prompt-tab-general/u);
   assert.match(guide, /prompt-tab-grok/u);
   assert.match(guide, /prompt-tab-hermes/u);
   assert.match(guide, /prompt-tab-openclaw/u);
-  assert.match(prompt, /Existing Gossip identity/u);
-  assert.match(prompt, /Existing wallet elsewhere/u);
-  assert.match(prompt, /Fresh identity/u);
-  assert.match(prompt, /Do not pause for another confirmation/u);
-  assert.match(prompt, /--profile gossip-eip191-v2/u);
-  assert.match(prompt, /gossip\/2-draft\.1/u);
-  assert.match(prompt, /gossip_capabilities/u);
-  assert.match(
-    prompt,
-    /six-tool v2 surface|gossip_capabilities.*gossip_feedback/u,
-  );
-  assert.match(prompt, /trust the signed gossip_capabilities response/u);
-  assert.match(
-    prompt,
-    /Public MCP endpoint: https:\/\/api\.gossip-protocol\.xyz\/mcp/u,
-  );
-  assert.match(
-    prompt,
-    /Capabilities endpoint: https:\/\/api\.gossip-protocol\.xyz\/v2\/gossip\/capabilities/u,
-  );
-  assert.match(
-    prompt,
-    /Exact signing audience: https:\/\/api\.gossip-protocol\.xyz\//u,
-  );
-  assert.match(prompt, /https:\/\/robinhood-rpc\.publicnode\.com/u);
-  assert.match(
-    prompt,
-    /never print, request, paste or copy a seed phrase, private key/iu,
-  );
-  assert.match(prompt, /Gossip does not enable trading/u);
-  assert.match(
-    prompt,
-    /productionVerified to false unless a signed production request and clean host acceptance/u,
-  );
-  assert.doesNotMatch(
-    prompt,
-    /067ee0|sherwood-eip191-personal-sign-v1|engine-production-c4d8|only after I approve/u,
-  );
+  assert.match(guide, /id="prompt-access-form"/u);
+  assert.match(guide, /type="password"/u);
+  assert.match(guide, /<noscript>/u);
+  assert.doesNotMatch(guide, /npm ci --ignore-scripts/u);
+  assert.doesNotMatch(guide, /Set up the Gossip Agent Kit v2/u);
+  assert.doesNotMatch(guide, /0x[0-9a-f]{40}/iu);
 });
 
-test("prompt tabs keep every host prompt readable without JavaScript", async () => {
+test("prompt tabs and panels start in a locked empty state", async () => {
   const guide = await readPublic("connect.html");
   const tabs = [...guide.matchAll(/<button\b[^>]*\brole="tab"[^>]*>/gu)];
   assert.equal(tabs.length, 4);
@@ -334,30 +330,84 @@ test("prompt tabs keep every host prompt readable without JavaScript", async () 
     const panel = guide.match(
       new RegExp('<pre\\s+id="' + id + '"[^>]*>([\\s\\S]*?)<\\/pre', "u"),
     );
-    assert.ok(panel?.[1].trim(), `${id} must be readable without JavaScript`);
-    assert.match(panel[1], /npm ci --ignore-scripts/u);
-    assert.match(panel[1], /npm run build/u);
-    assert.match(panel[1], /npm run typecheck/u);
-    assert.match(panel[1], /node dist\/cli\.js doctor/u);
+    assert.ok(panel, `${id} is missing`);
+    assert.equal(panel[1].trim(), "", `${id} must start empty`);
   }
-  assert.match(await readPublic("guide.js"), /activePromptPanel/u);
+  assert.match(guide, /class="prompt-tabs"[\s\S]*?hidden/u);
+  assert.match(guide, /class="prompt-panels" hidden/u);
 });
 
-test("Grok Bot prompt uses the first-party MCP agent tools", async () => {
-  const guide = await readPublic("connect.html");
-  const panel = guide.match(
-    /<pre\s+id="prompt-panel-grok"[^>]*>([\s\S]*?)<\/pre/u,
-  );
+test("prompt API fails closed and never returns prompts to a wrong password", () => {
+  const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
+  process.env.GOSSIP_PROMPT_PASSWORD_SHA256 =
+    "9246aa9be8de7b40d64eb664986430793b6cc13a19d2a456981e44f28303f9cf";
+  process.env.GOSSIP_PROMPTS_JSON = JSON.stringify(protectedPromptFixture);
 
-  assert.ok(panel?.[1], "Grok Bot prompt is missing");
-  assert.match(panel[1], /host-config --host grok-bot/u);
-  assert.match(panel[1], /AddMcpServer/u);
-  assert.match(panel[1], /GetMcpServerStatus/u);
-  assert.match(panel[1], /RestartMcpServers/u);
-  assert.match(panel[1], /GetDynamicTools/u);
-  assert.match(panel[1], /process\.execPath|actual Node executable/iu);
-  assert.match(panel[1], /only after.*gossip connect/isu);
-  assert.doesNotMatch(panel[1], /configuration API is undocumented/iu);
+  try {
+    const wrongPassword = invokeSetupPrompt({
+      body: { password: "wrong-password" },
+    });
+    assert.equal(wrongPassword.statusCode, 401);
+    assert.deepEqual(wrongPassword.body, { error: "invalid_password" });
+    assert.equal(wrongPassword.headers.get("cache-control"), "no-store");
+
+    const wrongMethod = invokeSetupPrompt({ method: "GET" });
+    assert.equal(wrongMethod.statusCode, 405);
+    assert.deepEqual(wrongMethod.body, { error: "method_not_allowed" });
+  } finally {
+    restoreEnvironmentVariable(
+      "GOSSIP_PROMPT_PASSWORD_SHA256",
+      previousPasswordHash,
+    );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
+  }
+});
+
+test("prompt API returns all prompts only after a valid password", () => {
+  const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
+  process.env.GOSSIP_PROMPT_PASSWORD_SHA256 =
+    "9246aa9be8de7b40d64eb664986430793b6cc13a19d2a456981e44f28303f9cf";
+  process.env.GOSSIP_PROMPTS_JSON = JSON.stringify(protectedPromptFixture);
+
+  try {
+    const result = invokeSetupPrompt({
+      body: { password: "correct-password" },
+    });
+    assert.equal(result.statusCode, 200);
+    assert.deepEqual(result.body, { prompts: protectedPromptFixture });
+    assert.equal(result.headers.get("cache-control"), "no-store");
+    assert.equal(
+      result.headers.get("content-type"),
+      "application/json; charset=utf-8",
+    );
+  } finally {
+    restoreEnvironmentVariable(
+      "GOSSIP_PROMPT_PASSWORD_SHA256",
+      previousPasswordHash,
+    );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
+  }
+});
+
+test("prompt API is unavailable when server configuration is missing", () => {
+  const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
+  delete process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  delete process.env.GOSSIP_PROMPTS_JSON;
+
+  try {
+    const result = invokeSetupPrompt({ body: { password: "anything" } });
+    assert.equal(result.statusCode, 503);
+    assert.deepEqual(result.body, { error: "prompt_access_unavailable" });
+  } finally {
+    restoreEnvironmentVariable(
+      "GOSSIP_PROMPT_PASSWORD_SHA256",
+      previousPasswordHash,
+    );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
+  }
 });
 
 test("public GitHub links stay within the canonical Gossip repository", async () => {
@@ -540,10 +590,13 @@ test("public pages contain no intake or private route and internal links resolve
   );
   const files = new Set(previewFiles.map(([path]) => path));
   for (const [page, html] of Object.entries(htmlByPage)) {
-    assert.doesNotMatch(
-      html,
-      /<form\b|<input\b|name=["'](?:token|password|private)/i,
-    );
+    if (page === "connect.html") {
+      assert.equal((html.match(/<form\b/gi) ?? []).length, 1);
+      assert.equal((html.match(/<input\b/gi) ?? []).length, 1);
+      assert.match(html, /<input[\s\S]*?type="password"/iu);
+    } else {
+      assert.doesNotMatch(html, /<form\b|<input\b/i);
+    }
     assert.doesNotMatch(html, /(?:\/intake|\/private|\/api\/)/i);
     for (const [, href] of html.matchAll(/href=["']([^"']+)["']/gi)) {
       if (/^(?:https?:|mailto:|javascript:)/i.test(href)) continue;
@@ -569,7 +622,13 @@ test("public pages contain no intake or private route and internal links resolve
 test("preview serves only the public allowlist with restrictive headers", async () => {
   const child = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL(".", import.meta.url),
-    env: { ...process.env, PORT: "0" },
+    env: {
+      ...process.env,
+      PORT: "0",
+      GOSSIP_PROMPT_PASSWORD_SHA256:
+        "a14aa70bc9c1e3b42ea93b56b895f9b0e329d2787277e8acf14c01ac4cb99804",
+      GOSSIP_PROMPTS_JSON: JSON.stringify(protectedPromptFixture),
+    },
     stdio: ["ignore", "pipe", "pipe"],
   });
   try {
@@ -614,6 +673,27 @@ test("preview serves only the public allowlist with restrictive headers", async 
         method,
       );
     }
+
+    const rejectedPrompt = await fetch(url + "/api/setup-prompt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: "wrong-password" }),
+    });
+    assert.equal(rejectedPrompt.status, 401);
+    assert.deepEqual(await rejectedPrompt.json(), {
+      error: "invalid_password",
+    });
+
+    const acceptedPrompt = await fetch(url + "/api/setup-prompt", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: "preview-password" }),
+    });
+    assert.equal(acceptedPrompt.status, 200);
+    assert.equal(acceptedPrompt.headers.get("cache-control"), "no-store");
+    assert.deepEqual(await acceptedPrompt.json(), {
+      prompts: protectedPromptFixture,
+    });
   } finally {
     const exited = once(child, "exit");
     child.kill();
@@ -621,13 +701,16 @@ test("preview serves only the public allowlist with restrictive headers", async 
   }
 });
 
-test("guide script has no network, credential, or storage behavior", async () => {
+test("guide script only requests protected prompts from the same origin", async () => {
   const script = await readPublic("guide.js");
   assert.doesNotMatch(
     script,
-    /\b(fetch|XMLHttpRequest|WebSocket|localStorage|sessionStorage)\b/,
+    /\b(XMLHttpRequest|WebSocket|localStorage|sessionStorage)\b/,
   );
-  assert.doesNotMatch(script, /privateKey|seedPhrase|password|credential/i);
+  assert.equal((script.match(/\bfetch\s*\(/gu) ?? []).length, 1);
+  assert.match(script, /fetch\("\/api\/setup-prompt"/u);
+  assert.match(script, /panel\.textContent = prompts\[promptName\]/u);
+  assert.doesNotMatch(script, /0x[0-9a-f]{40}/iu);
 });
 
 test("hero uses responsive mascot artwork and the display font is self-hosted", async () => {

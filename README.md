@@ -18,6 +18,20 @@ npm run check
 Preview: http://127.0.0.1:43848. Loopback only; occupied ports fail without stopping
 another process. Tests use an OS-assigned ephemeral port.
 
+## Protected setup prompts
+
+The public connection page starts with empty prompt panels. `POST /api/setup-prompt`
+returns the four prompts only after checking the submitted password against the
+server-side SHA-256 digest. Configure `GOSSIP_PROMPT_PASSWORD_SHA256` and
+`GOSSIP_PROMPTS_JSON` as sensitive Vercel environment variables; never commit
+their values. The JSON object must contain non-empty `general`, `grok`, `hermes`
+and `openclaw` strings.
+
+This is a temporary access gate. A public wallet address is guessable and does not
+provide strong authentication. The password is kept out of URLs, storage and logs,
+and prompts are returned with `Cache-Control: no-store`, but anyone who knows the
+password can inspect or copy the unlocked response.
+
 The public MCP endpoint is **https://api.gossip-protocol.xyz/mcp** and the exact
 signing audience is **https://api.gossip-protocol.xyz/**. The capabilities
 endpoint is **https://api.gossip-protocol.xyz/v2/gossip/capabilities**. Public

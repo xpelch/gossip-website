@@ -17,19 +17,20 @@ const promptTabs = [
   ...document.querySelectorAll('.prompt-tabs [role="tab"][aria-controls]'),
 ];
 const promptPanels = [...document.querySelectorAll("[data-prompt-panel]")];
+const promptTabList = document.querySelector(".prompt-tabs");
+const promptPanelList = document.querySelector(".prompt-panels");
 const promptCopyButton = document.querySelector('[data-copy="agent-prompt"]');
 const promptFeedback = document.getElementById("agent-prompt-feedback");
-let activePromptPanel = document.getElementById("agent-prompt");
-
-function keepPromptFallback() {
-  for (const panel of promptPanels) {
-    panel.hidden = false;
-  }
-  activePromptPanel = document.getElementById("agent-prompt");
-  if (promptCopyButton) {
-    promptCopyButton.hidden = !activePromptPanel;
-  }
-}
+const promptAccessForm = document.getElementById("prompt-access-form");
+const promptPassword = document.getElementById("prompt-password");
+const promptAccessFeedback = document.getElementById("prompt-access-feedback");
+const promptNamesByPanelId = {
+  "agent-prompt": "general",
+  "prompt-panel-grok": "grok",
+  "prompt-panel-hermes": "hermes",
+  "prompt-panel-openclaw": "openclaw",
+};
+let activePromptPanel = null;
 
 function selectPrompt(tab, moveFocus = false) {
   const panel = document.getElementById(tab.getAttribute("aria-controls"));
@@ -55,44 +56,107 @@ function selectPrompt(tab, moveFocus = false) {
   }
 }
 
-try {
-  if (promptTabs.length && promptPanels.length) {
-    selectPrompt(promptTabs[0]);
-    for (const [index, tab] of promptTabs.entries()) {
-      tab.addEventListener("click", () => selectPrompt(tab));
-      tab.addEventListener("keydown", (event) => {
-        let nextIndex;
-        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-          nextIndex = (index + 1) % promptTabs.length;
-        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-          nextIndex = (index + promptTabs.length - 1) % promptTabs.length;
-        } else if (event.key === "Home") {
-          nextIndex = 0;
-        } else if (event.key === "End") {
-          nextIndex = promptTabs.length - 1;
-        }
-        if (nextIndex !== undefined) {
-          event.preventDefault();
-          selectPrompt(promptTabs[nextIndex], true);
-        }
-      });
+for (const [index, tab] of promptTabs.entries()) {
+  tab.addEventListener("click", () => selectPrompt(tab));
+  tab.addEventListener("keydown", (event) => {
+    let nextIndex;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      nextIndex = (index + 1) % promptTabs.length;
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      nextIndex = (index + promptTabs.length - 1) % promptTabs.length;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = promptTabs.length - 1;
     }
+    if (nextIndex !== undefined) {
+      event.preventDefault();
+      selectPrompt(promptTabs[nextIndex], true);
+    }
+  });
+}
+
+if (promptCopyButton && promptFeedback) {
+  promptCopyButton.addEventListener("click", async () => {
+    if (!activePromptPanel) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(activePromptPanel.textContent);
+      promptFeedback.textContent =
+        "Copied. Paste it into your agent to get started.";
+    } catch {
+      promptFeedback.textContent =
+        "Clipboard unavailable. Select the prompt above and copy it manually.";
+    }
+  });
+}
+
+function revealPrompts(prompts) {
+  for (const panel of promptPanels) {
+    const promptName = promptNamesByPanelId[panel.id];
+    if (
+      typeof prompts[promptName] !== "string" ||
+      !prompts[promptName].trim()
+    ) {
+      throw new Error("Prompt response is incomplete");
+    }
+
+    panel.textContent = prompts[promptName];
   }
-  if (promptCopyButton && activePromptPanel && promptFeedback) {
-    promptCopyButton.hidden = false;
-    promptCopyButton.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(activePromptPanel.textContent);
-        promptFeedback.textContent =
-          "Copied. Paste it into your agent to get started.";
-      } catch {
-        promptFeedback.textContent =
-          "Clipboard unavailable. Select the prompt above and copy it manually.";
+
+  promptTabList.hidden = false;
+  promptPanelList.hidden = false;
+  promptAccessForm.hidden = true;
+  promptCopyButton.hidden = false;
+  selectPrompt(promptTabs[0]);
+}
+
+if (
+  promptAccessForm &&
+  promptPassword &&
+  promptAccessFeedback &&
+  promptTabList &&
+  promptPanelList &&
+  promptTabs.length === promptPanels.length
+) {
+  promptAccessForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = promptAccessForm.querySelector('[type="submit"]');
+    submitButton.disabled = true;
+    promptAccessFeedback.textContent = "Checking access…";
+
+    try {
+      const response = await fetch("/api/setup-prompt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: promptPassword.value }),
+        cache: "no-store",
+        credentials: "omit",
+        referrerPolicy: "no-referrer",
+      });
+
+      if (!response.ok) {
+        promptAccessFeedback.textContent =
+          response.status === 401
+            ? "Incorrect password."
+            : "Prompt access is temporarily unavailable.";
+        return;
       }
-    });
-  }
-} catch {
-  keepPromptFallback();
+
+      const result = await response.json();
+      revealPrompts(result.prompts);
+      promptAccessFeedback.textContent = "";
+      promptFeedback.textContent = "Prompts unlocked for this page view.";
+    } catch {
+      promptAccessFeedback.textContent =
+        "Prompt access is temporarily unavailable.";
+    } finally {
+      promptPassword.value = "";
+      submitButton.disabled = false;
+    }
+  });
 }
 
 for (const button of document.querySelectorAll(
