@@ -306,6 +306,10 @@ test("prompt tabs keep every host prompt readable without JavaScript", async () 
       new RegExp('<pre\\s+id="' + id + '"[^>]*>([\\s\\S]*?)<\\/pre', "u"),
     );
     assert.ok(panel?.[1].trim(), `${id} must be readable without JavaScript`);
+    assert.match(panel[1], /npm ci --ignore-scripts/u);
+    assert.match(panel[1], /npm run build/u);
+    assert.match(panel[1], /npm run typecheck/u);
+    assert.match(panel[1], /node dist\/cli\.js doctor/u);
   }
   assert.match(await readPublic("guide.js"), /activePromptPanel/u);
 });
