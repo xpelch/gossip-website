@@ -7,7 +7,7 @@ import { once } from "node:events";
 const root = new URL("./public/", import.meta.url);
 const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
-const agentKitRepository = "https://github.com/xpelch/gossip";
+const agentKitRepository = "https://github.com/gossip-dev/gossip";
 const engineRepository = "https://github.com/xpelch/sherwood";
 const agentKitRevision = "ba360730e872534270ed54b3690a3c60b47c52cc";
 const agentKitArtifactSha256 =
@@ -136,7 +136,7 @@ function readJpegDimensions(image) {
   assert.fail("JPEG dimensions are missing");
 }
 
-test("Gossip availability exposes the local-only v2 boundary", async () => {
+test("Gossip availability exposes the reachable public v2 boundary", async () => {
   const availability = JSON.parse(await readPublic("availability.json"));
   assert.equal(availability.brand, "Gossip");
   assert.equal(availability.engine, "Sherwood");
