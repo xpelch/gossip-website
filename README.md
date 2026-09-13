@@ -63,7 +63,7 @@ assets or production evidence. Essential content remains readable without JavaSc
 ## Repository boundary
 
 This repository contains the Gossip website only. The agent toolkit and issue
-tracker live at https://github.com/xpelch/gossip. Extracted from Sherwood commit
+tracker live at https://github.com/gossip-dev/gossip. Extracted from Sherwood commit
 63d12b323a927f2abb8e4b7b4af96c7cd74aa912. Historical design documents retain
 their original context. The v2 kit is a developer preview; signed production
 and real-host acceptance remain open release gates.

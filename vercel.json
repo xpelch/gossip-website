@@ -7,7 +7,7 @@
   "redirects": [
     {
       "source": "/gossip/:path*",
-      "destination": "https://github.com/xpelch/gossip/:path*",
+      "destination": "https://github.com/gossip-dev/gossip/:path*",
       "permanent": false
     }
   ],
