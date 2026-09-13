@@ -1,12 +1,28 @@
-# Gossip integration contract v2
+# Historical v1 contract and Gossip v2 handoff
 
-This page defines the public Gossip product language and the current Sherwood
-integration contract. **Gossip** is the public brand for the contribution and
-agent experience. **Sherwood** is the intelligence engine behind it: it indexes
-Robinhood Chain (chain ID `4663`) and supplies the analysis, readiness, evidence,
-and privacy boundary.
+This document originally captured the website's second design revision against
+the Gossip v1 wire contract. It is retained for history and must not be used as
+the current setup contract. The current copy-paste setup prompt is in
+[`public/connect.html`](../public/connect.html), and its machine-readable pins are
+in [`public/availability.json`](../public/availability.json).
 
-The public agent contract is pinned to immutable Gossip commit
+The current candidate uses Gossip Agent Kit
+`95fcf79d9b31557e75b5ab472f4486548561a65a`, artifact SHA-256
+`66a958af73a354ffea46f1588733f3eddc124a29e62bbbe4764d9794eb795c2c`,
+Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`, endpoint
+`https://engine-production-c4d8.up.railway.app/mcp`, and audience
+`https://engine-production-c4d8.up.railway.app/`. Production and host acceptance
+remain false until signed and real-host evidence passes.
+
+## Historical v1 reference
+
+This section records the public Gossip product language and the historical
+Sherwood v1 integration contract. **Gossip** is the public brand for the
+contribution and agent experience. **Sherwood** is the intelligence engine behind
+it: it indexes Robinhood Chain (chain ID `4663`) and supplies the analysis,
+readiness, evidence, and privacy boundary.
+
+The historical public agent contract was pinned to immutable Gossip commit
 [`067ee0ffc0753bdd0e408931576059075c8cdaf7`](https://github.com/gossip-dev/gossip/tree/067ee0ffc0753bdd0e408931576059075c8cdaf7).
 The user reports that MCP and Gossip are plugged in. That report does not by
 itself establish the approved public HTTPS origin, audience, deployment flags,
@@ -15,9 +31,9 @@ configuration and an authenticated client check.
 
 ## Agent connection
 
-Sherwood exposes a stateless Streamable HTTP MCP endpoint at `/mcp`. The same
-wallet request authentication protects `/mcp` and the REST routes under
-`/v1/me/agent/`. For local development, the site may show
+For this historical v1 contract, Sherwood exposes a stateless Streamable HTTP MCP
+endpoint at `/mcp`. The same wallet request authentication protects `/mcp` and
+the REST routes under `/v1/me/agent/`. For local development, the site may show
 `https://localhost/mcp` as an unverified target; the actual HTTPS port, trusted
 certificate, and configured audience are still required. This is not a detected
 production endpoint, and no public production domain exists in the verified
@@ -48,12 +64,12 @@ compatibility; ERC-8004 registration is optional and is not an entry requirement
 
 Wallet-authenticated callers can use these four contribution tools:
 
-| Tool | Purpose |
-| --- | --- |
-| `agent_access` | Read standard/enriched balances, UTC reset, and `monetary_enabled`. |
-| `agent_consult` | Read indexed Token analysis with Readiness; enriched responses may include indexed `early_buyers`. |
-| `gossip_submit` | Submit one private typed Gossip v1 and receive a durable receipt. |
-| `gossip_receipt` | Read the contributor's outcome, policy version, allowance, and correction links. |
+| Tool             | Purpose                                                                                            |
+| ---------------- | -------------------------------------------------------------------------------------------------- |
+| `agent_access`   | Read standard/enriched balances, UTC reset, and `monetary_enabled`.                                |
+| `agent_consult`  | Read indexed Token analysis with Readiness; enriched responses may include indexed `early_buyers`. |
+| `gossip_submit`  | Submit one private typed Gossip v1 and receive a durable receipt.                                  |
+| `gossip_receipt` | Read the contributor's outcome, policy version, allowance, and correction links.                   |
 
 Wallet callers are restricted to these tools so consultation metering cannot be
 bypassed through legacy analytics tools. There is no agent-readable raw-Gossip
@@ -117,9 +133,9 @@ adapter version that can sign these requests. A clean client run must perform a
 harmless authenticated query and record the account, capabilities, freshness,
 source block, cohort, and Token Readiness.
 
-No real client run or production validation is recorded here. Telegram channel
-and personal-bot destinations are also deployment values; test URLs such as
-`sherwood_test_bot` are fixtures and are not public Gossip links. Disconnecting
-a per-request signer means removing its local signing authorization. Server-side
-revocation is available only if a deployment adds and verifies such a mechanism;
-clearing website state alone is not revocation.
+No real client run or production validation was recorded for this historical
+contract. Telegram channel and personal-bot destinations are also deployment
+values; test URLs such as `sherwood_test_bot` are fixtures and are not public
+Gossip links. Disconnecting a per-request signer means removing its local signing
+authorization. Server-side revocation is available only if a deployment adds and
+verifies such a mechanism; clearing website state alone is not revocation.

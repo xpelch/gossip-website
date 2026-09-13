@@ -118,7 +118,8 @@
         <pre id="agent-prompt">
 Set up the Gossip Agent Kit v2 for this agent.
 Repository: https://github.com/xpelch/gossip
-Pinned kit revision: 56d280c899f5d47d5e8f0c9bf3fb5147834ce7d3
+Pinned kit revision: 95fcf79d9b31557e75b5ab472f4486548561a65a
+Attested artifact SHA-256: 66a958af73a354ffea46f1588733f3eddc124a29e62bbbe4764d9794eb795c2c
 Read README.md, AGENTS.md, docs/setup-gossip.md, docs/bootstrap.md, docs/existing-wallet.md, docs/hosts.md, skills/setup-gossip/SKILL.md and skills/gossip/SKILL.md before running commands. Complete safe local steps yourself; ask me only for a missing path, wallet choice or permission you cannot determine locally.
 
 Target configuration:
@@ -144,7 +145,7 @@ Run setup-gossip with --host grok-bot, hermes or openclaw, the selected wallet m
 Grok Bot currently has no documented and tested MCP configuration API. Do not invent a path or claim its tools loaded: complete local kit setup, then report the Grok Bot integration blocker. Treat any other undocumented host the same way.
 
 5. Connect only with the v2 profile
-Run setup-gossip with --endpoint https://engine-production-c4d8.up.railway.app/mcp --audience https://engine-production-c4d8.up.railway.app/ --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Keep TLS verification enabled. Negotiate gossip_capabilities first and require the exact v2 profile, protocol/schema revisions and six-tool v2 bridge: gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. A successful signed v2 capability response is required; do not fall back to localhost, legacy v1 authentication or an unverified endpoint. If the endpoint, audience, signature, capability state or host load cannot be verified, leave connection status pending and report one concrete next action.
+Run setup-gossip with --endpoint https://engine-production-c4d8.up.railway.app/mcp --audience https://engine-production-c4d8.up.railway.app/ --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Keep TLS verification enabled. Negotiate gossip_capabilities first and require the exact v2 profile, protocol/schema revisions and six-tool v2 surface: gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. Respect each tool's reported capability state; an advertised name does not make feedback or private evidence usable. A successful signed v2 capability response is required; do not fall back to localhost, legacy v1 authentication or an unverified endpoint. If the endpoint, audience, signature, capability state or host load cannot be verified, leave connection status pending and report one concrete next action.
 
 Keep submissions, feedback, consultations, earned-credit use and trading disabled unless the engine capability report and a separate explicit authorization allow a specific operation. Setup must not submit Gossip data, spend credits, fund wallets, register identities onchain, approve tokens, sign transactions or execute trades. Gossip does not enable trading.
 
