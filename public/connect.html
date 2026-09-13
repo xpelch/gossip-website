@@ -168,8 +168,7 @@
           >
 Set up the Gossip Agent Kit v2 for this agent. Read README.md, AGENTS.md, docs/setup-gossip.md, docs/bootstrap.md, docs/existing-wallet.md, docs/hosts.md, skills/setup-gossip/SKILL.md and skills/gossip/SKILL.md before running commands. Complete safe local steps yourself; ask only for a missing path, wallet choice or permission you cannot determine locally.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned kit revision: ba360730e872534270ed54b3690a3c60b47c52cc
-Attested artifact SHA-256: e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a
+Pinned public source commit: d11a22e69bbdee562c28c130c5ad486fa6ef6088
 Target configuration:
 - Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 - Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
@@ -182,7 +181,7 @@ Target configuration:
 Identify whether this is Grok Bot, Hermes, OpenClaw or another host. Check OS, architecture, Node version, existing kit checkout, an actual absolute Gossip state directory, existing Gossip identity and host configuration. Use a dedicated checkout and one absolute STATE_DIRECTORY for every command. Preserve unrelated files and existing identities. Never print, request, paste or copy a seed phrase, private key, password, signature or signed header. Passwords belong only in the kit&#39;s trusted local prompt.
 
 2. Install prerequisites and the pinned kit safely
-Use Node 24.13.1 or a newer supported Node 24 runtime without replacing the host&#39;s system Node. On glibc Linux x64/arm64, download the bootstrap script at the pinned kit revision, inspect it, then run it locally; use --install-system-deps only with explicit apt/root authorization. Source env.sh in the same shell. Do not pipe network content to a shell, run an unpinned script, retry keyring setup blindly or create plaintext storage. On Windows use current-user DPAPI; unsupported protected storage is a blocker.
+Use Node 24.13.1 or a newer supported Node 24 runtime without replacing the host&#39;s system Node. If Node 24 is already verified, skip bootstrap. When bootstrap is required on glibc Linux x64/arm64, inspect the pinned source before running it; missing xz matters only when bootstrap is required. Use --install-system-deps only with explicit apt/root authorization. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. Source env.sh in the same shell. Do not pipe network content to a shell, run an unpinned script, retry keyring setup blindly or create plaintext storage. On Windows use current-user DPAPI; unsupported protected storage is a blocker.
 From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY.
 
 3. Detect and select the wallet path before connection
@@ -208,15 +207,14 @@ Finish with a short report: runtime and prerequisites, pinned kit revision, iden
           >
 Set up the Gossip Agent Kit v2 for Grok Bot.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned kit revision: ba360730e872534270ed54b3690a3c60b47c52cc
-Attested artifact SHA-256: e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a
+Pinned public source commit: d11a22e69bbdee562c28c130c5ad486fa6ef6088
 Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
 Exact signing audience: https://api.gossip-protocol.xyz/
 Profile: gossip-eip191-v2; protocol: gossip/2-draft.1; schema: 2026-09-09
 Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
 
-Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and host configuration. Use Node 24.13.1 or newer supported Node 24. Inspect and run the pinned bootstrap locally when required; install with npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
+Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and host configuration. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
 
 Grok Bot's native MCP configuration API is undocumented and untested. Use the terminal/setup fallback. Report loaded=false unless actual Grok Bot validation proves tools loaded; do not invent a native config path or remote server block. The local bridge signs requests.
 
@@ -232,15 +230,14 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
           >
 Set up the Gossip Agent Kit v2 for Hermes.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned kit revision: ba360730e872534270ed54b3690a3c60b47c52cc
-Attested artifact SHA-256: e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a
+Pinned public source commit: d11a22e69bbdee562c28c130c5ad486fa6ef6088
 Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
 Exact signing audience: https://api.gossip-protocol.xyz/
 Profile: gossip-eip191-v2; protocol: gossip/2-draft.1; schema: 2026-09-09
 Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
 
-Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and Hermes config. Use Node 24.13.1 or newer supported Node 24. Inspect and run the pinned bootstrap locally when required; install with npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
+Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and Hermes config. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
 
 Use Hermes' documented YAML configuration under mcp_servers. Add a local server named gossip that runs gossip serve with the actual absolute kit path discovered on this host. Pass the same absolute STATE_DIRECTORY and preserve every existing server and setting; the Gossip entry is additive. The local bridge signs requests. Do not invent a native remote configuration or claim loaded=true without actual validation of the resulting Hermes config and tool discovery.
 
@@ -256,15 +253,14 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
           >
 Set up the Gossip Agent Kit v2 for OpenClaw.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned kit revision: ba360730e872534270ed54b3690a3c60b47c52cc
-Attested artifact SHA-256: e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a
+Pinned public source commit: d11a22e69bbdee562c28c130c5ad486fa6ef6088
 Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
 Exact signing audience: https://api.gossip-protocol.xyz/
 Profile: gossip-eip191-v2; protocol: gossip/2-draft.1; schema: 2026-09-09
 Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
 
-Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and OpenClaw config. Use Node 24.13.1 or newer supported Node 24. Inspect and run the pinned bootstrap locally when required; install with npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
+Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and OpenClaw config. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
 
 Use OpenClaw's documented JSON configuration under mcp.servers. Add a local server named gossip that runs gossip serve with the actual absolute kit path discovered on this host. Pass the same absolute STATE_DIRECTORY and preserve every existing server and setting; the Gossip entry is additive. The local bridge signs requests. Do not invent a native remote configuration or claim loaded=true without actual validation of the resulting OpenClaw config and tool discovery.
 
