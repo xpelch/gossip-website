@@ -1634,6 +1634,10 @@ td code {
   overflow-x: auto;
 }
 .prompt-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   flex: 0 0 auto;
   border: 0;
   border-bottom: 2px solid transparent;
@@ -1650,6 +1654,22 @@ td code {
 }
 .prompt-tabs button[aria-selected="true"] {
   border-bottom-color: var(--accent);
+}
+.prompt-tab-logo {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  fill: currentColor;
+  color: var(--muted);
+}
+.prompt-tabs button:hover .prompt-tab-logo {
+  color: var(--text);
+}
+.prompt-tabs button[aria-selected="true"] .prompt-tab-logo {
+  color: var(--accent);
+}
+.prompt-tab-logo .logo-cutout {
+  fill: var(--surface);
 }
 .prompt-tabs button:focus-visible {
   outline-offset: -3px;
@@ -1706,10 +1726,14 @@ td code {
     justify-content: center;
   }
   .prompt-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-top: 22px;
   }
   .prompt-tabs button {
-    padding-inline: 12px;
+    flex-direction: column;
+    gap: 6px;
+    padding-inline: 2px;
     font-size: 12px;
   }
   .prompt-panels pre {
