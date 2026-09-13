@@ -10,10 +10,11 @@ host names remain the accessible tab labels.
 - **Grok Bot:** the circular, two-eyed mark from the official
   [Grok Bot introduction](https://x.ai/news/introducing-grok-bot), with its
   original paths retained and the fills adapted to the site palette.
-- **Hermes:** the wing displayed on the [official Hermes Agent homepage](https://hermes-agent.nousresearch.com/).
-  The [original SVG](https://web-assets.nousresearch.com/nousnet-web/assets/hermes-landing/teams/hermes-wing.6ee276e9bff5a166.svg)
-  silhouette path is retained; its blue texture overlay is omitted and the fill
-  follows the site palette for legibility at 22 pixels.
+- **Hermes:** the Nous portrait selected by the user for this tab. The portrait
+  paths come from the [official Nous badge SVG](https://web-assets.nousresearch.com/nousnet-web/assets/hermes-landing/nous-girl-badge.57892048f67f4848.svg)
+  used on the [Hermes Agent homepage](https://hermes-agent.nousresearch.com/).
+  The lettering is omitted and the portrait is clipped to a rounded square,
+  matching the supplied reference. Both fills follow the site's tab palette.
 - **OpenClaw:** the mascot geometry from the
   [official favicon](https://openclaw.ai/favicon.svg), flattened to monochrome
   with the tiny eye highlights omitted for legibility at 22 pixels.
