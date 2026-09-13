@@ -18,12 +18,11 @@ npm run check
 Preview: http://127.0.0.1:43848. Loopback only; occupied ports fail without stopping
 another process. Tests use an OS-assigned ephemeral port.
 
-The candidate MCP endpoint is
-**https://engine-production-c4d8.up.railway.app/mcp**, with signing audience
-**https://engine-production-c4d8.up.railway.app/**. Anonymous probes establish a
-healthy protected deployment boundary, not signed production or host acceptance.
-The site performs no authentication request or transaction and does not proxy or
-provision an engine.
+The previous Railway candidate is offline. No public MCP endpoint or signing
+audience is currently advertised. An operator-local development runtime may be
+available at **http://127.0.0.1:18080/mcp** from that same host; it is not a
+production endpoint. The site performs no authentication request or transaction
+and does not proxy or provision an engine.
 
 ## Contents
 

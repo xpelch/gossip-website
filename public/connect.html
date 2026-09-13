@@ -123,8 +123,10 @@ Attested artifact SHA-256: e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb9
 Read README.md, AGENTS.md, docs/setup-gossip.md, docs/bootstrap.md, docs/existing-wallet.md, docs/hosts.md, skills/setup-gossip/SKILL.md and skills/gossip/SKILL.md before running commands. Complete safe local steps yourself; ask me only for a missing path, wallet choice or permission you cannot determine locally.
 
 Target configuration:
-- MCP endpoint: https://engine-production-c4d8.up.railway.app/mcp
-- Signing audience: https://engine-production-c4d8.up.railway.app/
+- Public MCP endpoint: unavailable
+- Public signing audience: unavailable
+- Operator-local development target: http://127.0.0.1:18080/mcp
+- Operator-local development audience: http://127.0.0.1:18080/
 - Profile: gossip-eip191-v2
 - Protocol: gossip/2-draft.1; schema revision: 2026-09-09
 
@@ -144,8 +146,8 @@ From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typ
 Run setup-gossip with --host grok-bot, hermes or openclaw, the selected wallet mode, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. For Hermes use its documented YAML config; for OpenClaw use its documented JSON config. Discover an existing absolute config path and pass it with --config; install the Gossip server additively and preserve other servers. Use --skills-directory only for an absolute user-selected skills directory and keep conflict checks enabled.
 Grok Bot currently has no documented and tested MCP configuration API. Do not invent a path or claim its tools loaded: complete local kit setup, then report the Grok Bot integration blocker. Treat any other undocumented host the same way.
 
-5. Connect only with the v2 profile
-Run setup-gossip with --endpoint https://engine-production-c4d8.up.railway.app/mcp --audience https://engine-production-c4d8.up.railway.app/ --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Keep TLS verification enabled. Negotiate gossip_capabilities first and require the exact v2 profile, protocol/schema revisions and six-tool v2 surface: gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. Respect each tool's reported capability state; an advertised name does not make feedback or private evidence usable. A successful signed v2 capability response is required; do not fall back to localhost, legacy v1 authentication or an unverified endpoint. If the endpoint, audience, signature, capability state or host load cannot be verified, leave connection status pending and report one concrete next action.
+5. Leave connection pending until an approved HTTPS target exists
+There is no public endpoint right now. If this agent runs on the operator host, it may check http://127.0.0.1:18080/health to diagnose the local runtime, but it must not pass that HTTP address to setup-gossip. When the availability record publishes an approved HTTPS endpoint and audience, run setup-gossip with those exact values, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Keep TLS verification enabled. Negotiate gossip_capabilities first and require the exact v2 profile, protocol/schema revisions and six-tool v2 surface: gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. Respect each tool's reported capability state; an advertised name does not make feedback or private evidence usable. Keep productionVerified and hostAcceptanceVerified false. Do not use the retired Railway address, legacy v1 authentication or any invented endpoint.
 
 Keep submissions, feedback, consultations, earned-credit use and trading disabled unless the engine capability report and a separate explicit authorization allow a specific operation. Setup must not submit Gossip data, spend credits, fund wallets, register identities onchain, approve tokens, sign transactions or execute trades. Gossip does not enable trading.
 
@@ -182,14 +184,18 @@ Finish with a short report: runtime and prerequisites, pinned kit revision, iden
               <h2>One connection. Six tools.</h2>
               <p>
                 MCP and Gossip v2 are integrated in the engine. The address
-                below is the configured Railway preview target, not proof of a
-                live production service or accepted host integration.
+                public endpoint is offline. The address below is an
+                operator-local development target, reachable only from the same
+                host.
               </p>
               <pre id="connection-record">
 {
-  "environment": "production-unverified",
-  "endpoint": "https://engine-production-c4d8.up.railway.app/mcp",
-  "audience": "https://engine-production-c4d8.up.railway.app/",
+  "environment": "local-development",
+  "endpoint": null,
+  "audience": null,
+  "development_target": "http://127.0.0.1:18080/mcp",
+  "development_target_audience": "http://127.0.0.1:18080/",
+  "developmentTargetVerified": false,
   "transport": "stateless-http",
   "protocol": "gossip/2-draft.1",
   "schema_revision": "2026-09-09",
@@ -485,10 +491,11 @@ Gossip v2 request
                 response cache.
               </p>
               <p>
-                HTTPS protects transit; the server still processes submitted
-                content. Monetary rewards are disabled. Any future funded
-                reserve requires approved rules and funding; there is no passive
-                yield, guaranteed token payment or trading authorization.
+                A future public endpoint must use HTTPS. The current HTTP target
+                is loopback-only; the server still processes submitted content.
+                Monetary rewards are disabled. Any future funded reserve
+                requires approved rules and funding; there is no passive yield,
+                guaranteed token payment or trading authorization.
               </p>
             </section>
             <section id="troubleshooting">
@@ -497,10 +504,10 @@ Gossip v2 request
                 <details>
                   <summary>Local endpoint cannot be reached</summary>
                   <p>
-                    Check the Railway HTTPS listener, trusted certificate,
-                    enabled v2 configuration and configured audience. A URL in
-                    this page does not start or discover an engine. Do not
-                    bypass TLS verification.
+                    Confirm this agent runs on the operator host, then check
+                    http://127.0.0.1:18080/health. A URL in this page does not
+                    start or discover an engine. If the local runtime is absent,
+                    leave the connection pending.
                   </p>
                 </details>
                 <details>
