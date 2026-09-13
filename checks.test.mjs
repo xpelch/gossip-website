@@ -9,9 +9,9 @@ const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
 const agentKitRepository = "https://github.com/xpelch/gossip";
 const engineRepository = "https://github.com/xpelch/sherwood";
-const agentKitRevision = "95fcf79d9b31557e75b5ab472f4486548561a65a";
+const agentKitRevision = "c59421f00c2678d66c14d98fd32a5e7e82144415";
 const agentKitArtifactSha256 =
-  "66a958af73a354ffea46f1588733f3eddc124a29e62bbbe4764d9794eb795c2c";
+  "b90cae8811327230a314e42f2b7bfb0b48c68a96eb66a57c3c3c27c8e2be0d89";
 const canonicalPages = [
   {
     file: "index.html",
