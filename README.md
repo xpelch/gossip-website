@@ -2,7 +2,7 @@
 
 Gossip is the product brand. Sherwood is its intelligence engine. This self-contained
 site is the public experience for #348. The current v2 candidate references
-public Gossip Agent Kit source commit `d11a22e69bbdee562c28c130c5ad486fa6ef6088` and Sherwood
+public Gossip Agent Kit source commit `f935e1be8b56d5d840c3d6facfc65103e3d21dc6` and Sherwood
 `db968f5010b9491b67190aff749d62f2ad0e7a97`.
 
 ## Run locally

@@ -9,7 +9,7 @@ const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
 const agentKitRepository = "https://github.com/gossip-dev/gossip";
 const engineRepository = "https://github.com/xpelch/sherwood";
-const agentKitRevision = "d11a22e69bbdee562c28c130c5ad486fa6ef6088";
+const agentKitRevision = "f935e1be8b56d5d840c3d6facfc65103e3d21dc6";
 const canonicalPages = [
   {
     file: "index.html",

@@ -7,7 +7,7 @@ the current setup contract. The current copy-paste setup prompt is in
 in [`public/availability.json`](../public/availability.json).
 
 The current candidate uses the public Gossip Agent Kit source commit
-`d11a22e69bbdee562c28c130c5ad486fa6ef6088`, installed in source-pinned mode,
+`f935e1be8b56d5d840c3d6facfc65103e3d21dc6`, installed in source-pinned mode,
 and Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`. The public endpoint is
 `https://api.gossip-protocol.xyz/mcp`, its capabilities endpoint is
 `https://api.gossip-protocol.xyz/v2/gossip/capabilities`, and its exact
