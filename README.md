@@ -2,7 +2,7 @@
 
 Gossip is the product brand. Sherwood is its intelligence engine. This self-contained
 site is the public experience for #348. The current v2 candidate references
-Gossip Agent Kit `c59421f00c2678d66c14d98fd32a5e7e82144415` and Sherwood
+Gossip Agent Kit `ba360730e872534270ed54b3690a3c60b47c52cc` and Sherwood
 `db968f5010b9491b67190aff749d62f2ad0e7a97`.
 
 ## Run locally
