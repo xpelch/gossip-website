@@ -49,7 +49,9 @@ authentication request or transaction and does not proxy or provision an engine.
 
 - `public/`: complete static website; landing and developer guide.
 - `public/availability.json`: code-backed candidate endpoint, source-pinned kit and engine revisions, diagnostic outcomes, and explicit verification flags.
-- `public/assets/gossip-hero.webp`: responsive mascot artwork with optional floating motion.
+- `public/index.html`: editable inline paper mascots with optional, pausable chain animation.
+- [Paper treatment, Refero references and motion](docs/design-content-v5.md).
+- `public/assets/gossip-hero.webp`: retained artwork from the earlier mascot treatment.
 - `public/assets/gossip-social.jpg`: sharing preview, with browser and home-screen icons in `public/`.
 - [Mascot identity, metadata and validation](docs/design-content-v4.md).
 - `public/fonts/`: self-hosted Bricolage Grotesque and OFL license.
@@ -76,7 +78,7 @@ npx --yes --package @playwright/cli playwright-cli -s=gossip-design open http://
 npx --yes --package @playwright/cli playwright-cli -s=gossip-design run-code --filename=browser-checks.js
 ```
 
-The CLI function expression intentionally has no trailing semicolon. Screenshots
+The CLI's named async function also passes the source formatter. Screenshots
 and local measurement records go under ignored `output/`; they are not application
 assets or production evidence. Essential content remains readable without JavaScript.
 
@@ -90,7 +92,7 @@ and real-host acceptance remain open release gates.
 
 ## Vercel hosting
 
-Import this repository with the Other framework preset and repository root. The checked-in configuration runs the checks and publishes only public/, with the same security headers as the local preview. No environment variables are required. The local preview server is not deployed.
+Import this repository with the Other framework preset and repository root. The checked-in configuration runs the checks and publishes public/ alongside the protected setup-prompt function, with the same security headers as the local preview. Keep the server-side prompt variables configured as described above. The local preview server is not deployed.
 
 The setup prompt uses `https://gossip-protocol.xyz/gossip` as its repository URL.
 Vercel redirects this path and its subpaths to the existing agent kit repository,

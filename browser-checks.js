@@ -1,8 +1,16 @@
-async (page) => {
+async function checkWebsite(page) {
   const base = "http://127.0.0.1:43848";
+  const paperSelectors = [
+    ".paper-character",
+    ".paper-block",
+    ".paper-signal",
+    ".paper-core",
+    ".paper-emphasis",
+  ];
   const results = [];
   const requests = [];
   page.on("request", (request) => requests.push(request.url()));
+  await page.emulateMedia({ reducedMotion: "no-preference" });
 
   for (const width of [360, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -13,6 +21,17 @@ async (page) => {
         width: innerWidth,
         content: document.documentElement.scrollWidth,
         h1: document.querySelectorAll("h1").length,
+        paperScene: (() => {
+          const scene = document.querySelector("svg.paper-scene");
+          if (!scene) return null;
+          const rect = scene.getBoundingClientRect();
+          return {
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            height: rect.height,
+          };
+        })(),
         brokenAnchors: [
           ...document.querySelectorAll('a[href^="#"], a[href*="#"]'),
         ]
@@ -30,6 +49,11 @@ async (page) => {
       if (
         metrics.content > width ||
         metrics.h1 !== 1 ||
+        (metrics.paperScene &&
+          (metrics.paperScene.width <= 0 ||
+            metrics.paperScene.height <= 0 ||
+            metrics.paperScene.left < -1 ||
+            metrics.paperScene.right > width + 1)) ||
         metrics.brokenAnchors.length
       )
         throw new Error(JSON.stringify(metrics));
@@ -43,10 +67,24 @@ async (page) => {
         fullPage: true,
         animations: "disabled",
       });
+      if (path === "/" && (width === 360 || width === 1440)) {
+        await page.screenshot({
+          path: `output/playwright/${width}-home-viewport.png`,
+          animations: "disabled",
+        });
+      }
     }
   }
 
   await page.goto(base + "/");
+  if ((await page.locator("svg.paper-scene").count()) !== 1)
+    throw new Error("Inline paper scene missing");
+  if (
+    (await page
+      .getByRole("img", { name: /Three connected Gossip paper mascots/ })
+      .count()) !== 1
+  )
+    throw new Error("Inline paper scene accessible name missing");
   await page.waitForFunction(
     () => document.querySelector(".hero").dataset.motion === "running",
   );
@@ -56,38 +94,117 @@ async (page) => {
     ))
   )
     throw new Error("Display font not loaded");
-  const initialTransform = await page
-    .locator(".floating-object")
-    .evaluate((el) => getComputedStyle(el).transform);
-  await page.waitForFunction(
-    (before) =>
-      getComputedStyle(document.querySelector(".floating-object")).transform !==
-      before,
-    initialTransform,
-  );
-  await page.getByRole("button", { name: "Pause motion" }).click();
-  if (
-    (await page
-      .locator(".floating-object")
-      .evaluate((el) => getComputedStyle(el).animationPlayState)) !== "paused"
-  )
-    throw new Error("Pause control failed");
-  await page.getByRole("button", { name: "Resume motion" }).click();
-  await page.locator("footer").scrollIntoViewIfNeeded();
-  await page.waitForFunction(
-    () => document.querySelector(".hero").dataset.motion === "paused",
-  );
-  await page.locator(".hero").scrollIntoViewIfNeeded();
-  await page.waitForFunction(
-    () => document.querySelector(".hero").dataset.motion === "running",
-  );
-  await page.emulateMedia({ reducedMotion: "reduce" });
+  const readPaperTimes = (selectors, waitForFrame = false) =>
+    page.evaluate(
+      async ({ classSelectors, waitForFrame: shouldWait }) => {
+        if (shouldWait) {
+          await new Promise(requestAnimationFrame);
+          await new Promise(requestAnimationFrame);
+        }
+        return classSelectors.flatMap((selector) =>
+          [...document.querySelectorAll(selector)].flatMap((element) =>
+            [...element.getAnimations()].map(
+              (animation) => animation.currentTime,
+            ),
+          ),
+        );
+      },
+      { classSelectors: selectors, waitForFrame },
+    );
+  const countAnimationTimeChanges = (before, after) =>
+    before.filter(
+      (time, index) =>
+        Number.isFinite(time) &&
+        Number.isFinite(after[index]) &&
+        Math.abs(after[index] - time) > 0.1,
+    ).length;
+  const hasAnimationTimeChange = (before, after) =>
+    countAnimationTimeChanges(before, after) > 0;
+  const waitForPaperState = async (state) =>
+    page.waitForFunction(
+      ({ selectors, expectedState }) => {
+        const elements = selectors.flatMap((selector) => [
+          ...document.querySelectorAll(selector),
+        ]);
+        const animations = elements.flatMap((element) => [
+          ...element.getAnimations(),
+        ]);
+        return (
+          animations.length > 0 &&
+          animations.every((animation) => animation.playState === expectedState)
+        );
+      },
+      { selectors: paperSelectors, expectedState: state },
+    );
+  await page.waitForFunction((selectors) => {
+    const characters = [...document.querySelectorAll(".paper-character")];
+    return (
+      characters.length === 3 &&
+      characters.every(
+        (element) =>
+          getComputedStyle(element).animationName !== "none" &&
+          element
+            .getAnimations()
+            .some((animation) => animation.playState === "running"),
+      ) &&
+      selectors.every((selector) => {
+        const elements = [...document.querySelectorAll(selector)];
+        return (
+          elements.length > 0 &&
+          elements.every((element) => element.getAnimations().length > 0)
+        );
+      })
+    );
+  }, paperSelectors);
+  const characterBefore = await readPaperTimes([".paper-character"]);
+  const characterAfter = await readPaperTimes([".paper-character"], true);
+  if (countAnimationTimeChanges(characterBefore, characterAfter) < 2)
+    throw new Error("Multiple paper character animations did not run");
   if (
     (await page
       .locator(".floating-object")
       .evaluate((el) => getComputedStyle(el).animationName)) !== "none"
   )
-    throw new Error("Reduced motion did not stop sculpture");
+    throw new Error("Floating object should remain static");
+  await page.getByRole("button", { name: "Pause motion" }).click();
+  await waitForPaperState("paused");
+  const pausedBefore = await readPaperTimes(paperSelectors);
+  const pausedAfter = await readPaperTimes(paperSelectors, true);
+  if (hasAnimationTimeChange(pausedBefore, pausedAfter))
+    throw new Error("Pause control did not freeze paper animations");
+  await page.getByRole("button", { name: "Resume motion" }).click();
+  await waitForPaperState("running");
+  const resumedBefore = await readPaperTimes(paperSelectors);
+  const resumedAfter = await readPaperTimes(paperSelectors, true);
+  if (!hasAnimationTimeChange(resumedBefore, resumedAfter))
+    throw new Error("Resume control did not restart paper animations");
+  await page.locator("footer").scrollIntoViewIfNeeded();
+  await page.waitForFunction(
+    () => document.querySelector(".hero").dataset.motion === "paused",
+  );
+  await waitForPaperState("paused");
+  await page.locator(".hero").scrollIntoViewIfNeeded();
+  await page.waitForFunction(
+    () => document.querySelector(".hero").dataset.motion === "running",
+  );
+  await waitForPaperState("running");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.waitForFunction((selectors) => {
+    const elements = selectors.flatMap((selector) => [
+      ...document.querySelectorAll(selector),
+    ]);
+    return (
+      document.querySelector(".hero").dataset.motion === "paused" &&
+      elements.length > 0 &&
+      elements.every(
+        (element) =>
+          getComputedStyle(element).animationName === "none" &&
+          element
+            .getAnimations()
+            .every((animation) => animation.playState !== "running"),
+      )
+    );
+  }, paperSelectors);
   if (!(await page.getByRole("button", { name: "Motion off" }).isDisabled()))
     throw new Error("Reduced motion control state");
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -183,6 +300,56 @@ async (page) => {
 
   await page.goto(base + "/connect.html");
   const prompt = page.locator("#agent-prompt");
+  const assertPromptsLocked = async (currentPage) => {
+    if (
+      !(await currentPage.locator("#prompt-access-form").isVisible()) ||
+      (await currentPage.locator(".prompt-tabs").isVisible()) ||
+      (await currentPage.locator(".prompt-panels").isVisible()) ||
+      (await currentPage.locator('[data-copy="agent-prompt"]').isVisible())
+    )
+      throw new Error("Protected prompt controls should remain locked");
+    for (const panel of await currentPage
+      .locator("[data-prompt-panel]")
+      .all()) {
+      if ((await panel.textContent()).trim())
+        throw new Error("Locked page contains protected prompt content");
+    }
+  };
+  await assertPromptsLocked(page);
+
+  // API authorization is checked in checks.test.mjs; these fixtures exercise the UI.
+  const fixturePrompts = {
+    general: "Synthetic General prompt\nBrowser clipboard fixture.",
+    grok: "Synthetic Grok prompt\nBrowser clipboard fixture.",
+    hermes: "Synthetic Hermes prompt\nBrowser clipboard fixture.",
+    openclaw: "Synthetic OpenClaw prompt\nBrowser clipboard fixture.",
+  };
+  await page.route(base + "/api/setup-prompt", async (route) => {
+    const request = route.request();
+    if (request.method() !== "POST")
+      throw new Error("Prompt unlock must use POST");
+    const authorized = request.postDataJSON().password === "browser-fixture";
+    await route.fulfill({
+      status: authorized ? 200 : 401,
+      contentType: "application/json",
+      body: JSON.stringify(
+        authorized ? { prompts: fixturePrompts } : { error: "Unauthorized" },
+      ),
+    });
+  });
+  await page.getByLabel("Access password").fill("incorrect-fixture");
+  await page.getByRole("button", { name: "Unlock prompts" }).click();
+  await page.waitForFunction(() =>
+    document
+      .querySelector("#prompt-access-feedback")
+      .textContent.includes("Incorrect password"),
+  );
+  await assertPromptsLocked(page);
+  await page.getByLabel("Access password").fill("browser-fixture");
+  await page.getByRole("button", { name: "Unlock prompts" }).click();
+  await prompt.waitFor({ state: "visible" });
+  if ((await prompt.textContent()) !== fixturePrompts.general)
+    throw new Error("Unlocked prompt fixture mismatch");
   const renderedPrompt = await prompt.textContent();
   await page.getByRole("button", { name: "Copy General prompt" }).click();
   await page.waitForFunction(() =>
@@ -228,6 +395,9 @@ async (page) => {
       .querySelector("#agent-prompt-feedback")
       .textContent.includes("manually"),
   );
+  await page.reload();
+  await assertPromptsLocked(page);
+  await page.unroute(base + "/api/setup-prompt");
 
   await page.goto(base + "/connect.html#tools");
   if (
@@ -271,20 +441,14 @@ async (page) => {
       throw new Error("No-JS home content missing");
     if (path === "/connect.html" && !text.includes("Your agent"))
       throw new Error("No-JS guide content missing");
-    if (
-      path === "/connect.html" &&
-      !(await plain.locator("#agent-prompt").textContent())
-    )
-      throw new Error("No-JS prompt content missing");
     if (path === "/connect.html") {
-      for (const id of [
-        "prompt-panel-grok",
-        "prompt-panel-hermes",
-        "prompt-panel-openclaw",
-      ]) {
-        if (!(await plain.locator("#" + id).textContent()))
-          throw new Error("No-JS host prompt content missing: " + id);
-      }
+      await assertPromptsLocked(plain);
+      if (
+        !text.includes(
+          "JavaScript is required to request the protected installation prompts",
+        )
+      )
+        throw new Error("No-JS protected prompt explanation missing");
     }
     if (path === "/connect.html") {
       const technicalDetails = plain.locator("#technical-details");
@@ -300,6 +464,27 @@ async (page) => {
       )
     )
       throw new Error("No-JS overflow");
+    if (path === "/") {
+      const defaultMotion = await plain.evaluate((selectors) => {
+        const elements = selectors.flatMap((selector) => [
+          ...document.querySelectorAll(selector),
+        ]);
+        return {
+          scene: document.querySelector("svg.paper-scene") !== null,
+          animations: elements.flatMap((element) =>
+            [...element.getAnimations()].map(
+              (animation) => animation.playState,
+            ),
+          ),
+        };
+      }, paperSelectors);
+      if (
+        !defaultMotion.scene ||
+        defaultMotion.animations.length === 0 ||
+        defaultMotion.animations.some((playState) => playState !== "paused")
+      )
+        throw new Error("Paper animations should start paused");
+    }
   }
   await noJs.close();
   console.log(
@@ -311,6 +496,7 @@ async (page) => {
       copySuccess: true,
       copyFailure: true,
       promptCopy: true,
+      promptGate: true,
       technicalDetails: true,
       reducedMotion: true,
       skipLink: true,

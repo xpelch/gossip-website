@@ -779,14 +779,10 @@ test("guide script only requests protected prompts from the same origin", async 
   assert.doesNotMatch(script, /0x[0-9a-f]{40}/iu);
 });
 
-test("hero uses responsive mascot artwork and the display font is self-hosted", async () => {
+test("hero uses the inline paper scene and the display font is self-hosted", async () => {
   const home = await readPublic("index.html");
-  assert.match(home, /src="assets\/gossip-hero\.webp"/);
-  const sourceSet = home.match(/srcset="([^"]+)"/)?.[1];
-  assert.equal(
-    sourceSet?.trim().replace(/\s+/g, " "),
-    "assets/gossip-hero-small.webp 768w, assets/gossip-hero.webp 1536w",
-  );
+  assert.match(home, /<svg\b[^>]*class="[^"]*\bpaper-scene\b/);
+  assert.doesNotMatch(home, /<img\b[^>]*gossip-hero(?:-small)?\.webp/i);
   assert.doesNotMatch(home, /gossip-floating\.png|gossip-signal\.png/);
 
   const font = await readFile(new URL("fonts/bricolage-grotesque.ttf", root));

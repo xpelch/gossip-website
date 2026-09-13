@@ -117,18 +117,459 @@
         </div>
         <div class="hero-art">
           <div class="floating-object">
-            <img
-              src="assets/gossip-hero.webp"
-              srcset="
-                assets/gossip-hero-small.webp  768w,
-                assets/gossip-hero.webp       1536w
-              "
-              sizes="(max-width: 560px) calc(100vw - 40px), (max-width: 800px) 50vw, 720px"
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
               width="1536"
               height="1024"
-              alt="Three connected Gossip mascots: an orange bubble, a smiling black bubble and a winking cream bubble."
-              fetchpriority="high"
-            />
+              viewBox="0 0 768 512"
+              fill="none"
+              role="img"
+              aria-labelledby="paper-title paper-description"
+              class="paper-scene"
+            >
+              <title id="paper-title">
+                Three connected Gossip paper mascots
+              </title>
+              <desc id="paper-description">
+                An orange curious face, a charcoal smiling face and an ivory
+                winking face share a signal through an orange chain with folded
+                blocks.
+              </desc>
+              <defs>
+                <path
+                  id="paper-bubble"
+                  d="M -109 1 C -109 -56 -65 -96 -4 -96 C 59 -96 109 -58 109 0 C 109 36 92 63 61 79 L 67 109 L 29 88 C -44 101 -109 65 -109 1 Z"
+                />
+                <path
+                  id="paper-mask"
+                  d="M -80 0 C -80 -36 -49 -57 -4 -57 C 42 -57 79 -36 79 0 C 79 37 49 53 1 53 C -47 53 -80 36 -80 0 Z"
+                />
+              </defs>
+              <g
+                id="paper-orange-chain"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M 300 155 L 266 173 L 248 203 M 501 195 L 531 213 L 553 239 L 557 265 M 399 221 L 394 280 L 339 288 M 399 293 L 446 320 M 388 308 L 355 337 L 310 348 L 341 379 L 389 398 L 436 395 L 465 378"
+                  stroke="#090A09"
+                  stroke-width="9"
+                />
+                <path
+                  d="M 300 155 L 266 173 L 248 203 M 501 195 L 531 213 L 553 239 L 557 265 M 399 221 L 394 280 L 339 288 M 399 293 L 446 320 M 388 308 L 355 337 L 310 348 L 341 379 L 389 398 L 436 395 L 465 378"
+                  stroke="#F47720"
+                  stroke-width="3.5"
+                  stroke-dasharray="6 6"
+                  class="paper-signal"
+                />
+                <g fill="#FF912F" stroke="#171610" stroke-width="3">
+                  <path
+                    d="M 258 174 L 266 179 L 266 188 L 258 193 L 251 188 L 251 179 Z"
+                  />
+                  <path
+                    d="M 524 203 L 533 208 L 533 218 L 525 222 L 517 217 L 517 208 Z"
+                  />
+                  <path
+                    d="M 350 330 L 359 334 L 360 343 L 352 349 L 344 345 L 343 336 Z"
+                  />
+                  <path
+                    d="M 432 386 L 441 391 L 441 401 L 433 406 L 425 401 L 425 391 Z"
+                  />
+                </g>
+                <g stroke="#FFCF77" stroke-width="2.5">
+                  <path d="M 255 180 L 259 178 L 263 181" />
+                  <path d="M 521 208 L 525 207 L 529 210" />
+                  <path d="M 348 335 L 351 334 L 355 336" />
+                  <path d="M 429 392 L 433 390 L 437 393" />
+                </g>
+              </g>
+              <g class="paper-emphasis">
+                <g id="paper-orange-emphasis" stroke-linejoin="round">
+                  <g
+                    fill="#AA4217"
+                    stroke="#080A09"
+                    stroke-width="5"
+                    transform="translate(3 6)"
+                  >
+                    <path
+                      d="M 523 107 L 539 55 L 550 49 L 563 56 L 565 67 L 535 113 Z"
+                    />
+                    <path
+                      d="M 546 123 L 584 93 L 596 94 L 606 105 L 604 117 L 552 138 Z"
+                    />
+                    <path
+                      d="M 550 155 L 594 151 L 607 162 L 605 175 L 594 180 L 549 165 Z"
+                    />
+                  </g>
+                  <g fill="#FF882D" stroke="#FFB65D" stroke-width="2">
+                    <path
+                      d="M 523 107 L 539 55 L 550 49 L 563 56 L 565 67 L 535 113 Z"
+                    />
+                    <path
+                      d="M 546 123 L 584 93 L 596 94 L 606 105 L 604 117 L 552 138 Z"
+                    />
+                    <path
+                      d="M 550 155 L 594 151 L 607 162 L 605 175 L 594 180 L 549 165 Z"
+                    />
+                  </g>
+                  <g fill="#FFB24E">
+                    <path d="M 527 101 L 541 58 L 550 53 L 554 56 L 540 71 Z" />
+                    <path d="M 551 124 L 586 97 L 595 98 L 592 102 Z" />
+                    <path d="M 554 157 L 593 154 L 600 160 L 573 159 Z" />
+                  </g>
+                </g>
+              </g>
+              <g class="paper-character paper-character--top">
+                <g
+                  id="paper-upper-companion"
+                  transform="matrix(.98 .16 -.11 .97 407 137)"
+                  stroke-linejoin="round"
+                >
+                  <use
+                    transform="translate(7 10)"
+                    fill="#090A09"
+                    stroke="#090A09"
+                    stroke-width="7"
+                    href="#paper-bubble"
+                  />
+                  <use
+                    transform="translate(2 5)"
+                    fill="#D56423"
+                    stroke="#161611"
+                    stroke-width="5"
+                    href="#paper-bubble"
+                  />
+                  <use
+                    fill="#303331"
+                    stroke="#111310"
+                    stroke-width="4"
+                    href="#paper-bubble"
+                  />
+                  <path
+                    d="M -106 2 C -106 -51 -64 -93 -4 -93 C 28 -93 60 -83 80 -65 L 69 -74 L 19 -85 L -29 -80 L -70 -56 L -92 -17 L -92 25 L -79 49 C -96 38 -105 21 -106 2 Z"
+                    fill="#464A44"
+                  />
+                  <path
+                    d="M -94 45 C -55 86 14 83 53 60 L 86 36 L 103 2 C 103 35 87 59 57 76 L 62 100 L 31 83 C -27 94 -72 76 -94 45 Z"
+                    fill="#202422"
+                  />
+                  <path
+                    d="M -106 -9 C -102 -43 -82 -69 -52 -84"
+                    stroke="#F09445"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <use
+                    transform="translate(1 4)"
+                    fill="#141714"
+                    stroke="#141714"
+                    stroke-width="5"
+                    href="#paper-mask"
+                  />
+                  <use
+                    fill="#F5EBD8"
+                    stroke="#111511"
+                    stroke-width="4"
+                    href="#paper-mask"
+                  />
+                  <path
+                    d="M -75 16 C -63 41 -32 48 0 48 C 33 48 58 43 71 25 L 56 34 L 11 39 L -33 34 Z"
+                    fill="#DED0B8"
+                  />
+                  <path
+                    d="M -68 -21 C -53 -43 -28 -50 0 -50"
+                    stroke="#FFF9EC"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M -51 1 C -51 -22 -19 -23 -18 1 M 19 1 C 21 -23 53 -22 54 1"
+                    stroke="#1D211F"
+                    stroke-width="12"
+                    stroke-linecap="round"
+                  />
+                  <path d="M 37 82 L 57 76 L 62 100 Z" fill="#171C19" />
+                </g>
+              </g>
+              <g class="paper-character paper-character--left">
+                <g
+                  id="paper-left-companion"
+                  transform="matrix(.96 -.20 .10 .94 236 296)"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M -109 1 C -109 -56 -65 -96 -4 -96 C 59 -96 109 -58 109 0 C 109 55 62 91 3 91 L -68 115 L -60 79 C -92 62 -109 37 -109 1 Z"
+                    transform="translate(6 11)"
+                    fill="#090A09"
+                    stroke="#090A09"
+                    stroke-width="7"
+                  />
+                  <path
+                    d="M -109 1 C -109 -56 -65 -96 -4 -96 C 59 -96 109 -58 109 0 C 109 55 62 91 3 91 L -68 115 L -60 79 C -92 62 -109 37 -109 1 Z"
+                    transform="translate(2 6)"
+                    fill="#B74418"
+                    stroke="#161610"
+                    stroke-width="5"
+                  />
+                  <path
+                    d="M -109 1 C -109 -56 -65 -96 -4 -96 C 59 -96 109 -58 109 0 C 109 55 62 91 3 91 L -68 115 L -60 79 C -92 62 -109 37 -109 1 Z"
+                    fill="#FF8628"
+                    stroke="#131710"
+                    stroke-width="4"
+                  />
+                  <path
+                    d="M -105 6 C -111 -47 -65 -92 -4 -92 C 36 -92 70 -76 90 -51 L 55 -70 L 9 -79 L -37 -69 L -72 -46 L -94 -7 L -95 35 Z"
+                    fill="#FFA541"
+                  />
+                  <path
+                    d="M -99 32 C -65 81 28 88 80 47 L 102 20 C 91 65 53 89 2 87 L -62 108 L -54 77 C -76 66 -91 52 -99 32 Z"
+                    fill="#EB631B"
+                  />
+                  <path
+                    d="M -100 -19 C -84 -61 -45 -83 -5 -83"
+                    stroke="#FFD17C"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <use
+                    transform="translate(2 5)"
+                    fill="#CD561C"
+                    stroke="#CD561C"
+                    stroke-width="4"
+                    href="#paper-mask"
+                  />
+                  <use
+                    fill="#242C29"
+                    stroke="#141A15"
+                    stroke-width="4"
+                    href="#paper-mask"
+                  />
+                  <path
+                    d="M -77 -4 C -72 -40 -42 -56 0 -55 C 36 -55 61 -40 70 -26 L 44 -39 L 4 -44 L -37 -37 L -63 -20 Z"
+                    fill="#36403A"
+                  />
+                  <g fill="#BDB6A5">
+                    <ellipse cx="-28" cy="6" rx="15.5" ry="17" />
+                    <ellipse cx="31" cy="3" rx="15.5" ry="17" />
+                  </g>
+                  <g fill="#FFF4E2" stroke="#161D17" stroke-width="2">
+                    <ellipse cx="-29" cy="2" rx="15.5" ry="17" />
+                    <ellipse cx="30" cy="-1" rx="15.5" ry="17" />
+                  </g>
+                  <path d="M -56 79 L -32 88 L -62 108 Z" fill="#FF9532" />
+                </g>
+              </g>
+              <g class="paper-core">
+                <g id="paper-central-chain-node" stroke-linejoin="round">
+                  <path
+                    d="M 379 263 L 400 258 L 418 272 L 423 294 L 408 313 L 386 318 L 369 305 L 364 283 Z"
+                    fill="#090A09"
+                    stroke="#090A09"
+                    stroke-width="4"
+                  />
+                  <path
+                    d="M 378 261 L 399 256 L 416 269 L 421 289 L 406 308 L 385 313 L 368 300 L 363 279 Z"
+                    fill="#CB511C"
+                    stroke="#161910"
+                    stroke-width="3"
+                  />
+                  <path
+                    d="M 378 258 L 399 253 L 416 266 L 421 286 L 406 305 L 385 310 L 368 297 L 363 276 Z"
+                    fill="#FF8B2C"
+                    stroke="#FFC469"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M 378 258 L 399 253 L 406 262 L 382 267 L 371 281 L 363 276 Z"
+                    fill="#FFC05E"
+                  />
+                  <path
+                    d="M 416 266 L 421 286 L 406 305 L 385 310 L 385 300 L 403 294 Z"
+                    fill="#F46B1F"
+                  />
+                  <path
+                    d="M 380 267 L 391 264 L 388 273 L 378 277 Z"
+                    fill="#FFF0B6"
+                  />
+                </g>
+              </g>
+              <g class="paper-character paper-character--right">
+                <g
+                  id="paper-right-companion"
+                  transform="matrix(.94 .22 -.12 .94 541 346)"
+                  stroke-linejoin="round"
+                >
+                  <use
+                    transform="translate(7 10)"
+                    fill="#090A09"
+                    stroke="#090A09"
+                    stroke-width="7"
+                    href="#paper-bubble"
+                  />
+                  <use
+                    transform="translate(2 6)"
+                    fill="#AC9A7D"
+                    stroke="#171913"
+                    stroke-width="5"
+                    href="#paper-bubble"
+                  />
+                  <use
+                    fill="#F2E8D3"
+                    stroke="#161B15"
+                    stroke-width="4"
+                    href="#paper-bubble"
+                  />
+                  <path
+                    d="M -104 3 C -109 -47 -66 -91 -4 -92 C 35 -92 75 -71 93 -43 L 58 -66 L 15 -79 L -35 -70 L -71 -45 L -92 -13 L -97 25 Z"
+                    fill="#FFF6E7"
+                  />
+                  <path
+                    d="M -98 40 C -56 82 25 79 76 44 L 103 9 C 100 40 83 61 57 77 L 62 101 L 31 83 C -29 94 -77 73 -98 40 Z"
+                    fill="#DCCCAF"
+                  />
+                  <path
+                    d="M -104 -3 C -99 -35 -81 -57 -61 -72"
+                    stroke="#FFAD46"
+                    stroke-width="3"
+                    stroke-linecap="round"
+                  />
+                  <use
+                    transform="translate(2 4)"
+                    fill="#B5A58C"
+                    stroke="#B5A58C"
+                    stroke-width="5"
+                    href="#paper-mask"
+                  />
+                  <use
+                    fill="#242B27"
+                    stroke="#151C16"
+                    stroke-width="4"
+                    href="#paper-mask"
+                  />
+                  <path
+                    d="M -76 -8 C -70 -37 -40 -54 0 -54 C 34 -54 62 -40 73 -22 L 43 -37 L 3 -43 L -36 -35 L -60 -20 Z"
+                    fill="#353E35"
+                  />
+                  <ellipse cx="-35" cy="-1" rx="15" ry="16.5" fill="#ACA895" />
+                  <ellipse
+                    cx="-36"
+                    cy="-4"
+                    rx="15"
+                    ry="16.5"
+                    fill="#FFF1DB"
+                    stroke="#151D15"
+                    stroke-width="2"
+                  />
+                  <path
+                    d="M 9 7 C 11 -15 42 -15 44 7"
+                    stroke="#181F17"
+                    stroke-width="15"
+                    stroke-linecap="round"
+                    transform="translate(1 3)"
+                  />
+                  <path
+                    d="M 9 7 C 11 -15 42 -15 44 7"
+                    stroke="#FFF0D6"
+                    stroke-width="11"
+                    stroke-linecap="round"
+                  />
+                  <path d="M 36 82 L 57 77 L 62 101 Z" fill="#F8EFD9" />
+                </g>
+              </g>
+              <g
+                id="paper-chain-blocks"
+                stroke="#12170F"
+                stroke-width="3"
+                stroke-linejoin="round"
+              >
+                <g class="paper-block paper-block--orange">
+                  <g
+                    id="paper-orange-block"
+                    transform="translate(209 167) rotate(-27)"
+                  >
+                    <path
+                      d="M -14 -16 L 11 -16 L 20 -8 L 20 15 L -4 17 L -14 9 Z"
+                      transform="translate(3 5)"
+                      fill="#070B08"
+                    />
+                    <path
+                      d="M -14 -16 L 11 -16 L 20 -8 L 20 15 L -4 17 L -14 9 Z"
+                      fill="#FF9C39"
+                    />
+                    <path
+                      d="M -14 -16 L 11 -16 L 20 -8 L -5 -7 Z"
+                      fill="#FFD078"
+                    />
+                    <path
+                      d="M -5 -7 L 20 -8 L 20 15 L -4 17 Z"
+                      fill="#FF8827"
+                    />
+                    <path
+                      d="M -14 -16 L -5 -7 L -4 17 L -14 9 Z"
+                      fill="#E4611D"
+                    />
+                    <path
+                      d="M -1 -3 L 15 -4 L 15 11"
+                      stroke="#FFB954"
+                      stroke-width="2"
+                    />
+                  </g>
+                </g>
+                <g class="paper-block paper-block--right">
+                  <g
+                    id="paper-ivory-block-right"
+                    transform="translate(582 220) rotate(19)"
+                  >
+                    <path
+                      d="M -13 -12 L 9 -16 L 17 -9 L 17 12 L -6 15 L -13 8 Z"
+                      transform="translate(3 5)"
+                      fill="#070B08"
+                    />
+                    <path
+                      d="M -13 -12 L 9 -16 L 17 -9 L 17 12 L -6 15 L -13 8 Z"
+                      fill="#F3E9D2"
+                    />
+                    <path
+                      d="M -13 -12 L 9 -16 L 17 -9 L -6 -5 Z"
+                      fill="#FFF9E9"
+                    />
+                    <path
+                      d="M -13 -12 L -6 -5 L -6 15 L -13 8 Z"
+                      fill="#C5B290"
+                    />
+                  </g>
+                </g>
+                <g class="paper-block paper-block--lower">
+                  <g
+                    id="paper-ivory-block-lower"
+                    transform="translate(391 395) rotate(17)"
+                  >
+                    <path
+                      d="M -16 -13 L 8 -17 L 18 -8 L 18 15 L -7 19 L -16 10 Z"
+                      transform="translate(4 5)"
+                      fill="#070B08"
+                    />
+                    <path
+                      d="M -16 -13 L 8 -17 L 18 -8 L 18 15 L -7 19 L -16 10 Z"
+                      fill="#F2E6CC"
+                    />
+                    <path
+                      d="M -16 -13 L 8 -17 L 18 -8 L -7 -4 Z"
+                      fill="#FFF8E7"
+                    />
+                    <path
+                      d="M -16 -13 L -7 -4 L -7 19 L -16 10 Z"
+                      fill="#BAA17B"
+                    />
+                    <path
+                      d="M -3 1 L 12 -1 L 12 11"
+                      stroke="#FFF6E3"
+                      stroke-width="2"
+                    />
+                  </g>
+                </g>
+              </g>
+            </svg>
           </div>
           <span class="conversation-tag tag-ask" aria-hidden="true"
             >Ask a better question.</span
