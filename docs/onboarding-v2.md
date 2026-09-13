@@ -9,10 +9,10 @@ in [`public/availability.json`](../public/availability.json).
 The current candidate uses Gossip Agent Kit
 `ba360730e872534270ed54b3690a3c60b47c52cc`, artifact SHA-256
 `e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a`,
-Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`, endpoint
-`https://engine-production-c4d8.up.railway.app/mcp`, and audience
-`https://engine-production-c4d8.up.railway.app/`. Production and host acceptance
-remain false until signed and real-host evidence passes.
+Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`. The previous Railway
+candidate is offline, so the public endpoint and audience are null. The
+operator-local development target is `http://127.0.0.1:18080/mcp`, available
+only from the same host. Production and host acceptance remain false.
 
 ## Historical v1 reference
 

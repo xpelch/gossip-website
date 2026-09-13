@@ -161,9 +161,10 @@ async (page) => {
       .textContent.includes("copied"),
   );
   const copied = await page.evaluate(
-    async () => JSON.parse(await navigator.clipboard.readText()).endpoint,
+    async () =>
+      JSON.parse(await navigator.clipboard.readText()).development_target,
   );
-  if (copied !== "https://engine-production-c4d8.up.railway.app/mcp")
+  if (copied !== "http://127.0.0.1:18080/mcp")
     throw new Error("Copy content mismatch");
   await page.evaluate(() =>
     Object.defineProperty(navigator.clipboard, "writeText", {

@@ -24,11 +24,11 @@ A Luna worker documented the contract; coordinator corrected the public-key byte
 wording and incorporated the user's localhost choice. Gossip is the public brand;
 Sherwood protocol strings and header names remain unchanged.
 
-At the time of this report, `https://localhost/mcp` was the explicitly unverified
-development target and no engine was authenticated. The current site now publishes
-the Railway production candidate endpoint and audience while keeping
-`productionVerified` and `hostAcceptanceVerified` false. Anonymous health and
-authentication-failure probes do not replace a signed production run.
+At the time of this report, `https://localhost/mcp` was the explicitly
+unverified development target and no engine was authenticated. The site later
+published a Railway production candidate, but that endpoint is now offline. The
+current availability record publishes no production endpoint or audience and
+identifies the operator-local runtime as an unverified development target.
 
 ## Local checks
 

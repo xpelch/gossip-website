@@ -136,24 +136,22 @@ function readJpegDimensions(image) {
   assert.fail("JPEG dimensions are missing");
 }
 
-test("Gossip availability exposes the unverified v2 preview contract", async () => {
+test("Gossip availability exposes the local-only v2 boundary", async () => {
   const availability = JSON.parse(await readPublic("availability.json"));
   assert.equal(availability.brand, "Gossip");
   assert.equal(availability.engine, "Sherwood");
   assert.equal(availability.agentKitRevision, agentKitRevision);
   assert.equal(availability.agentKitArtifactSha256, agentKitArtifactSha256);
-  assert.equal(availability.status, "production-unverified");
-  assert.equal(
-    availability.endpoint,
-    "https://engine-production-c4d8.up.railway.app/mcp",
-  );
-  assert.equal(
-    availability.audience,
-    "https://engine-production-c4d8.up.railway.app/",
-  );
+  assert.equal(availability.status, "local-development");
+  assert.equal(availability.endpoint, null);
+  assert.equal(availability.audience, null);
   assert.equal(availability.productionVerified, false);
   assert.equal(availability.hostAcceptanceVerified, false);
-  assert.equal(availability.developmentTarget, null);
+  assert.equal(availability.developmentTarget, "http://127.0.0.1:18080/mcp");
+  assert.equal(
+    availability.developmentTargetAudience,
+    "http://127.0.0.1:18080/",
+  );
   assert.equal(availability.developmentTargetVerified, false);
   assert.equal(availability.protocol, "gossip/2-draft.1");
   assert.equal(availability.schemaRevision, "2026-09-09");
@@ -177,6 +175,12 @@ test("Gossip availability exposes the unverified v2 preview contract", async () 
   const record = JSON.parse(recordMatch[1]);
   assert.equal(record.endpoint, availability.endpoint);
   assert.equal(record.audience, availability.audience);
+  assert.equal(record.development_target, availability.developmentTarget);
+  assert.equal(
+    record.development_target_audience,
+    availability.developmentTargetAudience,
+  );
+  assert.equal(record.developmentTargetVerified, false);
   assert.equal(record.transport, availability.transport);
   assert.equal(record.protocol, availability.protocol);
   assert.equal(record.schema_revision, availability.schemaRevision);
@@ -210,6 +214,8 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
   assert.match(prompt, /gossip_capabilities/u);
   assert.match(prompt, /six-tool v2 surface/u);
   assert.match(prompt, /Respect each tool's reported capability state/u);
+  assert.match(prompt, /Public MCP endpoint: unavailable/u);
+  assert.match(prompt, /http:\/\/127\.0\.0\.1:18080\/mcp/u);
   assert.match(
     prompt,
     /never print, request, paste or copy a seed phrase, private key/iu,
@@ -221,7 +227,7 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
   );
   assert.doesNotMatch(
     prompt,
-    /067ee0|sherwood-eip191-personal-sign-v1|https:\/\/localhost\/mcp|only after I approve/u,
+    /067ee0|sherwood-eip191-personal-sign-v1|engine-production-c4d8|only after I approve/u,
   );
 });
 
