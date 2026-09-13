@@ -318,4 +318,4 @@ async (page) => {
       noJavaScript: true,
     }),
   );
-};
+}
