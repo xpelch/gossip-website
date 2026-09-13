@@ -168,7 +168,7 @@
           >
 Set up the Gossip Agent Kit v2 for this agent. Read README.md, AGENTS.md, docs/setup-gossip.md, docs/bootstrap.md, docs/existing-wallet.md, docs/hosts.md, skills/setup-gossip/SKILL.md and skills/gossip/SKILL.md before running commands. Complete safe local steps yourself; ask only for a missing path, wallet choice or permission you cannot determine locally.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 7fa6e4efaa262cd8180ab2a434300c9d61a13809
+Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
 Target configuration:
 - Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 - Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
@@ -190,7 +190,7 @@ From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typ
 - Fresh identity: when no reusable identity or supported wallet is present, run setup-gossip with --wallet create and protected storage. Do not pause for another confirmation. Reruns must preserve the same public address. Creation needs no ETH, transaction or engine access.
 
 4. Install the host integration additively
-Run setup-gossip with the detected host, selected wallet mode, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Use an actual absolute config path when one exists; preserve unrelated settings and servers. The local bridge signs requests. Never invent native remote configuration.
+Run setup-gossip with the detected host, selected wallet mode, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Use an actual absolute config path when one exists; preserve unrelated settings and servers. For Grok Bot, only after gossip connect succeeds, run host-config --host grok-bot and pass its emitted configuration.arguments unchanged to the first-party AddMcpServer tool; then call RestartMcpServers and verify GetMcpServerStatus plus GetDynamicTools in the next message. The local bridge signs requests. Never invent native remote configuration or a Node executable path.
 
 5. Verify the public boundary diagnostically
 Use the exact endpoint, capabilities URL and audience above with TLS verification enabled. Expected diagnostics are capabilities 200, MCP initialize 200, MCP tools/list 200, replayed nonce 401 and invalid signature 401. These outcomes are diagnostic only. Tool listing is discovery only and does not make a tool usable; Respect each tool's reported capability state. Include the gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback six-tool v2 surface only as discovery. The public record keeps http and durable_operations installed; atomic_consult, signed_receipts, evidence, public_submission and private_submission blocked; session_keys and tasks not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[] unless separate evidence changes them. Do not submit, consult, spend, fund, approve, register or trade. Gossip does not enable trading.
@@ -207,7 +207,7 @@ Finish with a short report: runtime and prerequisites, pinned kit revision, iden
           >
 Set up the Gossip Agent Kit v2 for Grok Bot.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 7fa6e4efaa262cd8180ab2a434300c9d61a13809
+Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
 Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
 Exact signing audience: https://api.gossip-protocol.xyz/
@@ -216,11 +216,13 @@ Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
 
 Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and host configuration. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
 
-Grok Bot's native MCP configuration API is undocumented and untested. Use the terminal/setup fallback. Report loaded=false unless actual Grok Bot validation proves tools loaded; do not invent a native config path or remote server block. The local bridge signs requests.
+Grok Bot exposes first-party agent tools for additive MCP registration. Do not invent or edit a settings file. The terminal kit cannot invoke those host tools itself. The local bridge signs requests.
 
 Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage and must preserve its address on rerun. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
 
 Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; tool listing is discovery only. Keep http and durable_operations installed; atomic_consult, signed_receipts, evidence, public_submission and private_submission blocked; session_keys and tasks not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[].
+
+Run gossip connect before registering the native MCP. If connect remains pending, do not call AddMcpServer; report the engine capability blockers. Only after gossip connect succeeds, run node dist/cli.js host-config --host grok-bot --directory STATE_DIRECTORY. Pass the emitted configuration.arguments unchanged to AddMcpServer. They contain the actual Node executable (process.execPath), absolute CLI path, serve command and state directory; never replace them with a guessed runtime path. Call RestartMcpServers. The tools become available in the next message. Then require GetMcpServerStatus to report Gossip connected and GetDynamicTools to expose exactly gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. A successful AddMcpServer call alone is not host acceptance. Report loaded=false unless both checks pass, and repeat the status/tool check in a new conversation to prove persistence. Do not call UninstallMcpServer unless the user explicitly asks to remove Gossip.
           </pre>
           <pre
             id="prompt-panel-hermes"
@@ -230,7 +232,7 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
           >
 Set up the Gossip Agent Kit v2 for Hermes.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 7fa6e4efaa262cd8180ab2a434300c9d61a13809
+Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
 Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
 Exact signing audience: https://api.gossip-protocol.xyz/
@@ -253,7 +255,7 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
           >
 Set up the Gossip Agent Kit v2 for OpenClaw.
 Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 7fa6e4efaa262cd8180ab2a434300c9d61a13809
+Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
 Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
 Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
 Exact signing audience: https://api.gossip-protocol.xyz/

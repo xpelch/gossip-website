@@ -9,7 +9,7 @@ const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
 const agentKitRepository = "https://github.com/gossip-dev/gossip";
 const engineRepository = "https://github.com/xpelch/sherwood";
-const agentKitRevision = "7fa6e4efaa262cd8180ab2a434300c9d61a13809";
+const agentKitRevision = "79475467ce9d412b7d3f47792af96d6e23a395b9";
 const canonicalPages = [
   {
     file: "index.html",
@@ -312,6 +312,23 @@ test("prompt tabs keep every host prompt readable without JavaScript", async () 
     assert.match(panel[1], /node dist\/cli\.js doctor/u);
   }
   assert.match(await readPublic("guide.js"), /activePromptPanel/u);
+});
+
+test("Grok Bot prompt uses the first-party MCP agent tools", async () => {
+  const guide = await readPublic("connect.html");
+  const panel = guide.match(
+    /<pre\s+id="prompt-panel-grok"[^>]*>([\s\S]*?)<\/pre/u,
+  );
+
+  assert.ok(panel?.[1], "Grok Bot prompt is missing");
+  assert.match(panel[1], /host-config --host grok-bot/u);
+  assert.match(panel[1], /AddMcpServer/u);
+  assert.match(panel[1], /GetMcpServerStatus/u);
+  assert.match(panel[1], /RestartMcpServers/u);
+  assert.match(panel[1], /GetDynamicTools/u);
+  assert.match(panel[1], /process\.execPath|actual Node executable/iu);
+  assert.match(panel[1], /only after.*gossip connect/isu);
+  assert.doesNotMatch(panel[1], /configuration API is undocumented/iu);
 });
 
 test("public GitHub links stay within the canonical Gossip repository", async () => {
