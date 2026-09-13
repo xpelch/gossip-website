@@ -9,7 +9,9 @@ const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
 const agentKitRepository = "https://github.com/xpelch/gossip";
 const engineRepository = "https://github.com/xpelch/sherwood";
-const agentKitRevision = "56d280c899f5d47d5e8f0c9bf3fb5147834ce7d3";
+const agentKitRevision = "95fcf79d9b31557e75b5ab472f4486548561a65a";
+const agentKitArtifactSha256 =
+  "66a958af73a354ffea46f1588733f3eddc124a29e62bbbe4764d9794eb795c2c";
 const canonicalPages = [
   {
     file: "index.html",
@@ -138,6 +140,8 @@ test("Gossip availability exposes the unverified v2 preview contract", async () 
   const availability = JSON.parse(await readPublic("availability.json"));
   assert.equal(availability.brand, "Gossip");
   assert.equal(availability.engine, "Sherwood");
+  assert.equal(availability.agentKitRevision, agentKitRevision);
+  assert.equal(availability.agentKitArtifactSha256, agentKitArtifactSha256);
   assert.equal(availability.status, "production-unverified");
   assert.equal(
     availability.endpoint,
@@ -203,7 +207,8 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
   assert.match(prompt, /--profile gossip-eip191-v2/u);
   assert.match(prompt, /gossip\/2-draft\.1/u);
   assert.match(prompt, /gossip_capabilities/u);
-  assert.match(prompt, /six-tool v2 bridge/u);
+  assert.match(prompt, /six-tool v2 surface/u);
+  assert.match(prompt, /Respect each tool's reported capability state/u);
   assert.match(
     prompt,
     /never print, request, paste or copy a seed phrase, private key/iu,

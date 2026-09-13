@@ -1,8 +1,9 @@
 # Gossip public website
 
 Gossip is the product brand. Sherwood is its intelligence engine. This self-contained
-site is the public experience for #348, with implemented MCP/Gossip contract details
-verified from upstream revision `47695b9bbc86658b1c420810fcb304c5ea68fb79`.
+site is the public experience for #348. The current v2 candidate references
+Gossip Agent Kit `95fcf79d9b31557e75b5ab472f4486548561a65a` and Sherwood
+`db968f5010b9491b67190aff749d62f2ad0e7a97`.
 
 ## Run locally
 
@@ -17,23 +18,24 @@ npm run check
 Preview: http://127.0.0.1:43848. Loopback only; occupied ports fail without stopping
 another process. Tests use an OS-assigned ephemeral port.
 
-The user's development MCP target is **https://localhost/mcp**. It is deliberately
-separate from the website preview. It is not a detected running service: configure
-the engine's actual HTTPS port, trusted local certificate and audience, plus a
-compatible EOA signing adapter. No public domain is assigned. The site performs no
-authentication request or transaction and does not proxy or provision an engine.
+The candidate MCP endpoint is
+**https://engine-production-c4d8.up.railway.app/mcp**, with signing audience
+**https://engine-production-c4d8.up.railway.app/**. Anonymous probes establish a
+healthy protected deployment boundary, not signed production or host acceptance.
+The site performs no authentication request or transaction and does not proxy or
+provision an engine.
 
 ## Contents
 
 - `public/`: complete static website; landing and developer guide.
-- `public/availability.json`: code-backed capability metadata and explicitly unverified local target.
+- `public/availability.json`: code-backed candidate endpoint, immutable kit and engine revisions, and explicit verification flags.
 - `public/assets/gossip-hero.webp`: responsive mascot artwork with optional floating motion.
 - `public/assets/gossip-social.jpg`: sharing preview, with browser and home-screen icons in `public/`.
 - [Mascot identity, metadata and validation](docs/design-content-v4.md).
 - `public/fonts/`: self-hosted Bricolage Grotesque and OFL license.
 - [Floating refinement, motion and verification](docs/design-content-v3.md).
 - [Signal design lock and asset provenance](docs/design-content-v2.md).
-- [Verified integration contract](docs/onboarding-v2.md).
+- [Historical v1 integration contract and current v2 handoff](docs/onboarding-v2.md).
 - [Current validation evidence](docs/verification-v2.md).
 
 The v1 documents describe the historical Sherwood woodland preview and are

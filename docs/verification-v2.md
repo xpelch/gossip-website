@@ -1,7 +1,8 @@
 # Validation v2 — Gossip / Signal
 
-Date: 2026-09-06 America/Toronto (2026-09-07 UTC). Local worktree only. This report
-supersedes the v1 public-preview evidence for the current design.
+Date: 2026-09-06 America/Toronto (2026-09-07 UTC). This historical design report
+superseded the v1 public-preview evidence at that time. Current deployment and kit
+pins are recorded in `public/availability.json` and must take precedence.
 
 ## Design evidence
 
@@ -23,9 +24,11 @@ A Luna worker documented the contract; coordinator corrected the public-key byte
 wording and incorporated the user's localhost choice. Gossip is the public brand;
 Sherwood protocol strings and header names remain unchanged.
 
-No public URL exists according to the user. `https://localhost/mcp` is an explicitly
-unverified development target. No running engine was discovered or authenticated;
-no TLS bypass, signature, request to MCP, provisioned credential or transaction.
+At the time of this report, `https://localhost/mcp` was the explicitly unverified
+development target and no engine was authenticated. The current site now publishes
+the Railway production candidate endpoint and audience while keeping
+`productionVerified` and `hostAcceptanceVerified` false. Anonymous health and
+authentication-failure probes do not replace a signed production run.
 
 ## Local checks
 
@@ -41,6 +44,7 @@ indexing coverage, live allowances, expiry/replay rejection or server revocation
 Source-backed implementation descriptions are not a claim of a live public offer.
 No independent user comprehension study or full assistive-technology certification
 is claimed. No shared root build/deployment, backend, indexer, DB or Railway changes.
+
 ### Final results
 
 - Four Node checks passed: development/public metadata and guide consistency,

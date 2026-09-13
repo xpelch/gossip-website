@@ -4,6 +4,8 @@
   "engine": "Sherwood",
   "reviewedOn": "2026-09-12",
   "sourceRevision": "db968f5010b9491b67190aff749d62f2ad0e7a97",
+  "agentKitRevision": "95fcf79d9b31557e75b5ab472f4486548561a65a",
+  "agentKitArtifactSha256": "66a958af73a354ffea46f1588733f3eddc124a29e62bbbe4764d9794eb795c2c",
   "status": "production-unverified",
   "backendCapabilities": "implemented",
   "productionVerified": false,
