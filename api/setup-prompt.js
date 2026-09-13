@@ -63,7 +63,7 @@ function parsePrompts(serializedPrompts) {
 }
 
 function readPromptConfiguration() {
-  const encodedPrompts = process.env.GOSSIP_PROMPTS_BASE64;
+  const encodedPrompts = process.env.GOSSIP_PROMPTS_BASE64?.trim();
   if (encodedPrompts) {
     try {
       const decoded = Buffer.from(encodedPrompts, "base64");

@@ -371,10 +371,10 @@ test("prompt API returns all prompts only after a valid password", () => {
   const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
   process.env.GOSSIP_PROMPT_PASSWORD_SHA256 =
     "9246aa9be8de7b40d64eb664986430793b6cc13a19d2a456981e44f28303f9cf";
-  process.env.GOSSIP_PROMPTS_BASE64 = Buffer.from(
-    JSON.stringify(protectedPromptFixture),
-    "utf8",
-  ).toString("base64");
+  process.env.GOSSIP_PROMPTS_BASE64 =
+    Buffer.from(JSON.stringify(protectedPromptFixture), "utf8").toString(
+      "base64",
+    ) + "\n";
   delete process.env.GOSSIP_PROMPTS_JSON;
 
   try {
