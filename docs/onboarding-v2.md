@@ -8,14 +8,18 @@ in [`public/availability.json`](../public/availability.json).
 
 The current candidate uses the public Gossip Agent Kit source commit
 `79475467ce9d412b7d3f47792af96d6e23a395b9`, installed in source-pinned mode,
-and Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`. The public endpoint is
+and the deployed Sherwood engine revision
+`rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f`. The public endpoint is
 `https://api.gossip-protocol.xyz/mcp`, its capabilities endpoint is
 `https://api.gossip-protocol.xyz/v2/gossip/capabilities`, and its exact
 audience is `https://api.gossip-protocol.xyz/`. Diagnostic capabilities and
 MCP initialize/tools-list checks returned 200; replay and invalid-signature
-checks returned 401. These results are diagnostic only. Production and host
-acceptance remain false, and the capability record keeps consultations,
-receipts, evidence and submissions blocked.
+checks returned 401. Signed capabilities and MCP acceptance were recorded at
+`2026-09-13T16:25:47.977Z`. The live capability record verifies atomic
+consultation, durable operations, signed receipts and evidence, with each
+feature's evidence revision matching the deployed engine revision. Production
+and host acceptance remain false; public and private submissions remain blocked.
+The submission persistence check found 0 operations and 0 receipts.
 
 The Grok Bot prompt uses the host's additive `AddMcpServer` agent tool only
 after `gossip connect` succeeds. It consumes the exact payload emitted by
