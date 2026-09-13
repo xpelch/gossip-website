@@ -9,9 +9,7 @@ const pages = ["index.html", "connect.html"];
 const canonicalOrigin = "https://gossip-website.vercel.app";
 const agentKitRepository = "https://github.com/gossip-dev/gossip";
 const engineRepository = "https://github.com/xpelch/sherwood";
-const agentKitRevision = "ba360730e872534270ed54b3690a3c60b47c52cc";
-const agentKitArtifactSha256 =
-  "e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a";
+const agentKitRevision = "d11a22e69bbdee562c28c130c5ad486fa6ef6088";
 const canonicalPages = [
   {
     file: "index.html",
@@ -141,7 +139,8 @@ test("Gossip availability exposes the reachable public v2 boundary", async () =>
   assert.equal(availability.brand, "Gossip");
   assert.equal(availability.engine, "Sherwood");
   assert.equal(availability.agentKitRevision, agentKitRevision);
-  assert.equal(availability.agentKitArtifactSha256, agentKitArtifactSha256);
+  assert.equal(availability.agentKitArtifactSha256, null);
+  assert.equal(availability.agentKitInstallMode, "source-pinned");
   assert.equal(availability.status, "public-gateway-reachable");
   assert.equal(availability.endpoint, "https://api.gossip-protocol.xyz/mcp");
   assert.equal(
@@ -240,7 +239,10 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
 
   assert.match(prompt, /Repository: https:\/\/gossip-protocol\.xyz\/gossip/u);
   assert.doesNotMatch(prompt, /xpelch/iu);
-  assert.match(prompt, new RegExp(`Pinned kit revision: ${agentKitRevision}`));
+  assert.match(
+    prompt,
+    new RegExp(`Pinned public source commit: ${agentKitRevision}`),
+  );
   assert.match(guide, /prompt-tab-general/u);
   assert.match(guide, /prompt-tab-grok/u);
   assert.match(guide, /prompt-tab-hermes/u);
@@ -304,6 +306,10 @@ test("prompt tabs keep every host prompt readable without JavaScript", async () 
       new RegExp('<pre\\s+id="' + id + '"[^>]*>([\\s\\S]*?)<\\/pre', "u"),
     );
     assert.ok(panel?.[1].trim(), `${id} must be readable without JavaScript`);
+    assert.match(panel[1], /npm ci --ignore-scripts/u);
+    assert.match(panel[1], /npm run build/u);
+    assert.match(panel[1], /npm run typecheck/u);
+    assert.match(panel[1], /node dist\/cli\.js doctor/u);
   }
   assert.match(await readPublic("guide.js"), /activePromptPanel/u);
 });

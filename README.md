@@ -2,7 +2,7 @@
 
 Gossip is the product brand. Sherwood is its intelligence engine. This self-contained
 site is the public experience for #348. The current v2 candidate references
-Gossip Agent Kit `ba360730e872534270ed54b3690a3c60b47c52cc` and Sherwood
+public Gossip Agent Kit source commit `d11a22e69bbdee562c28c130c5ad486fa6ef6088` and Sherwood
 `db968f5010b9491b67190aff749d62f2ad0e7a97`.
 
 ## Run locally
@@ -31,7 +31,7 @@ authentication request or transaction and does not proxy or provision an engine.
 ## Contents
 
 - `public/`: complete static website; landing and developer guide.
-- `public/availability.json`: code-backed candidate endpoint, immutable kit and engine revisions, and explicit verification flags.
+- `public/availability.json`: code-backed candidate endpoint, source-pinned kit and engine revisions, diagnostic outcomes, and explicit verification flags.
 - `public/assets/gossip-hero.webp`: responsive mascot artwork with optional floating motion.
 - `public/assets/gossip-social.jpg`: sharing preview, with browser and home-screen icons in `public/`.
 - [Mascot identity, metadata and validation](docs/design-content-v4.md).
