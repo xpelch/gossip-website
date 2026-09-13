@@ -184,7 +184,7 @@ async (page) => {
   await page.goto(base + "/connect.html");
   const prompt = page.locator("#agent-prompt");
   const renderedPrompt = await prompt.textContent();
-  await page.getByRole("button", { name: "Copy prompt" }).click();
+  await page.getByRole("button", { name: "Copy General prompt" }).click();
   await page.waitForFunction(() =>
     document
       .querySelector("#agent-prompt-feedback")
@@ -197,6 +197,23 @@ async (page) => {
     ) !== renderedPrompt
   )
     throw new Error("Prompt copy content mismatch");
+  const hermesTab = page.getByRole("tab", { name: "Hermes" });
+  await hermesTab.click();
+  if (
+    (await hermesTab.getAttribute("aria-selected")) !== "true" ||
+    !(await page.locator("#prompt-panel-hermes").isVisible()) ||
+    (await page.locator("#agent-prompt").isVisible())
+  )
+    throw new Error("Host prompt tab state failed");
+  const hermesPrompt = await page.locator("#prompt-panel-hermes").textContent();
+  await page.getByRole("button", { name: "Copy Hermes prompt" }).click();
+  if (
+    (await page.evaluate(() => navigator.clipboard.readText())).replace(
+      /\r\n/g,
+      "\n",
+    ) !== hermesPrompt
+  )
+    throw new Error("Active host prompt copy content mismatch");
   await page.evaluate(() =>
     Object.defineProperty(navigator.clipboard, "writeText", {
       value: async () => {
@@ -205,7 +222,7 @@ async (page) => {
       configurable: true,
     }),
   );
-  await page.getByRole("button", { name: "Copy prompt" }).click();
+  await page.getByRole("button", { name: "Copy Hermes prompt" }).click();
   await page.waitForFunction(() =>
     document
       .querySelector("#agent-prompt-feedback")
@@ -260,6 +277,16 @@ async (page) => {
     )
       throw new Error("No-JS prompt content missing");
     if (path === "/connect.html") {
+      for (const id of [
+        "prompt-panel-grok",
+        "prompt-panel-hermes",
+        "prompt-panel-openclaw",
+      ]) {
+        if (!(await plain.locator("#" + id).textContent()))
+          throw new Error("No-JS host prompt content missing: " + id);
+      }
+    }
+    if (path === "/connect.html") {
       const technicalDetails = plain.locator("#technical-details");
       if (await technicalDetails.evaluate((el) => el.hasAttribute("open")))
         throw new Error("No-JS technical details should start closed");
@@ -291,4 +318,4 @@ async (page) => {
       noJavaScript: true,
     }),
   );
-};
+}

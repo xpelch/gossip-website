@@ -9,10 +9,14 @@ in [`public/availability.json`](../public/availability.json).
 The current candidate uses Gossip Agent Kit
 `ba360730e872534270ed54b3690a3c60b47c52cc`, artifact SHA-256
 `e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a`,
-Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`. The previous Railway
-candidate is offline, so the public endpoint and audience are null. The
-operator-local development target is `http://127.0.0.1:18080/mcp`, available
-only from the same host. Production and host acceptance remain false.
+Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`. The public endpoint is
+`https://api.gossip-protocol.xyz/mcp`, its capabilities endpoint is
+`https://api.gossip-protocol.xyz/v2/gossip/capabilities`, and its exact
+audience is `https://api.gossip-protocol.xyz/`. Diagnostic capabilities and
+MCP initialize/tools-list checks returned 200; replay and invalid-signature
+checks returned 401. These results are diagnostic only. Production and host
+acceptance remain false, and the capability record keeps consultations,
+receipts, evidence and submissions blocked.
 
 ## Historical v1 reference
 

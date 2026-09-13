@@ -13,7 +13,91 @@ if (route) {
       explanations[route.value];
   });
 }
-for (const button of document.querySelectorAll("[data-copy]")) {
+const promptTabs = [
+  ...document.querySelectorAll('.prompt-tabs [role="tab"][aria-controls]'),
+];
+const promptPanels = [...document.querySelectorAll("[data-prompt-panel]")];
+const promptCopyButton = document.querySelector('[data-copy="agent-prompt"]');
+const promptFeedback = document.getElementById("agent-prompt-feedback");
+let activePromptPanel = document.getElementById("agent-prompt");
+
+function keepPromptFallback() {
+  for (const panel of promptPanels) {
+    panel.hidden = false;
+  }
+  activePromptPanel = document.getElementById("agent-prompt");
+  if (promptCopyButton) {
+    promptCopyButton.hidden = !activePromptPanel;
+  }
+}
+
+function selectPrompt(tab, moveFocus = false) {
+  const panel = document.getElementById(tab.getAttribute("aria-controls"));
+  if (!panel) {
+    throw new Error("Prompt panel is missing");
+  }
+  for (const candidate of promptTabs) {
+    const selected = candidate === tab;
+    candidate.setAttribute("aria-selected", String(selected));
+    candidate.tabIndex = selected ? 0 : -1;
+  }
+  for (const candidate of promptPanels) {
+    candidate.hidden = candidate !== panel;
+  }
+  activePromptPanel = panel;
+  if (promptCopyButton) {
+    const hostName = tab.textContent.trim();
+    promptCopyButton.textContent = `Copy ${hostName} prompt`;
+    promptCopyButton.setAttribute("aria-label", `Copy ${hostName} prompt`);
+  }
+  if (moveFocus) {
+    tab.focus();
+  }
+}
+
+try {
+  if (promptTabs.length && promptPanels.length) {
+    selectPrompt(promptTabs[0]);
+    for (const [index, tab] of promptTabs.entries()) {
+      tab.addEventListener("click", () => selectPrompt(tab));
+      tab.addEventListener("keydown", (event) => {
+        let nextIndex;
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+          nextIndex = (index + 1) % promptTabs.length;
+        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+          nextIndex = (index + promptTabs.length - 1) % promptTabs.length;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = promptTabs.length - 1;
+        }
+        if (nextIndex !== undefined) {
+          event.preventDefault();
+          selectPrompt(promptTabs[nextIndex], true);
+        }
+      });
+    }
+  }
+  if (promptCopyButton && activePromptPanel && promptFeedback) {
+    promptCopyButton.hidden = false;
+    promptCopyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(activePromptPanel.textContent);
+        promptFeedback.textContent =
+          "Copied. Paste it into your agent to get started.";
+      } catch {
+        promptFeedback.textContent =
+          "Clipboard unavailable. Select the prompt above and copy it manually.";
+      }
+    });
+  }
+} catch {
+  keepPromptFallback();
+}
+
+for (const button of document.querySelectorAll(
+  '[data-copy]:not([data-copy="agent-prompt"])',
+)) {
   button.hidden = false;
   button.addEventListener("click", async () => {
     const id = button.dataset.copy;
@@ -23,14 +107,10 @@ for (const button of document.querySelectorAll("[data-copy]")) {
         document.getElementById(id).textContent,
       );
       feedback.textContent =
-        id === "agent-prompt"
-          ? "Copied. Paste it into your agent to get started."
-          : "Connection details copied. Configure your actual local engine and signing adapter.";
+        "Connection details copied. Configure your actual local engine and signing adapter.";
     } catch {
       feedback.textContent =
-        id === "agent-prompt"
-          ? "Clipboard unavailable. Select the prompt above and copy it manually."
-          : "Clipboard unavailable. Select the connection details above and copy them manually.";
+        "Clipboard unavailable. Select the connection details above and copy them manually.";
     }
   });
 }
