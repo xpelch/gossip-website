@@ -23,9 +23,11 @@ another process. Tests use an OS-assigned ephemeral port.
 The public connection page starts with empty prompt panels. `POST /api/setup-prompt`
 returns the four prompts only after checking the submitted password against the
 server-side SHA-256 digest. Configure `GOSSIP_PROMPT_PASSWORD_SHA256` and
-`GOSSIP_PROMPTS_JSON` as sensitive Vercel environment variables; never commit
-their values. The JSON object must contain non-empty `general`, `grok`, `hermes`
-and `openclaw` strings.
+`GOSSIP_PROMPTS_BASE64` as sensitive Vercel environment variables; never commit
+their values. Encode a UTF-8 JSON object containing non-empty `general`, `grok`,
+`hermes` and `openclaw` strings as canonical base64. This avoids multiline
+transformations in deployment dashboards. `GOSSIP_PROMPTS_JSON` remains
+available for local development.
 
 This is a temporary access gate. A public wallet address is guessable and does not
 provide strong authentication. The password is kept out of URLs, storage and logs,

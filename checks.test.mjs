@@ -366,10 +366,15 @@ test("prompt API fails closed and never returns prompts to a wrong password", ()
 
 test("prompt API returns all prompts only after a valid password", () => {
   const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousEncodedPrompts = process.env.GOSSIP_PROMPTS_BASE64;
   const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
   process.env.GOSSIP_PROMPT_PASSWORD_SHA256 =
     "9246aa9be8de7b40d64eb664986430793b6cc13a19d2a456981e44f28303f9cf";
-  process.env.GOSSIP_PROMPTS_JSON = JSON.stringify(protectedPromptFixture);
+  process.env.GOSSIP_PROMPTS_BASE64 = Buffer.from(
+    JSON.stringify(protectedPromptFixture),
+    "utf8",
+  ).toString("base64");
+  delete process.env.GOSSIP_PROMPTS_JSON;
 
   try {
     const result = invokeSetupPrompt({
@@ -387,14 +392,42 @@ test("prompt API returns all prompts only after a valid password", () => {
       "GOSSIP_PROMPT_PASSWORD_SHA256",
       previousPasswordHash,
     );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_BASE64", previousEncodedPrompts);
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
+  }
+});
+
+test("prompt API rejects malformed encoded prompt configuration", () => {
+  const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousEncodedPrompts = process.env.GOSSIP_PROMPTS_BASE64;
+  const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
+  process.env.GOSSIP_PROMPT_PASSWORD_SHA256 =
+    "9246aa9be8de7b40d64eb664986430793b6cc13a19d2a456981e44f28303f9cf";
+  process.env.GOSSIP_PROMPTS_BASE64 = "not canonical base64";
+  process.env.GOSSIP_PROMPTS_JSON = JSON.stringify(protectedPromptFixture);
+
+  try {
+    const result = invokeSetupPrompt({
+      body: { password: "correct-password" },
+    });
+    assert.equal(result.statusCode, 503);
+    assert.deepEqual(result.body, { error: "prompt_access_unavailable" });
+  } finally {
+    restoreEnvironmentVariable(
+      "GOSSIP_PROMPT_PASSWORD_SHA256",
+      previousPasswordHash,
+    );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_BASE64", previousEncodedPrompts);
     restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
   }
 });
 
 test("prompt API is unavailable when server configuration is missing", () => {
   const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousEncodedPrompts = process.env.GOSSIP_PROMPTS_BASE64;
   const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
   delete process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  delete process.env.GOSSIP_PROMPTS_BASE64;
   delete process.env.GOSSIP_PROMPTS_JSON;
 
   try {
@@ -406,6 +439,7 @@ test("prompt API is unavailable when server configuration is missing", () => {
       "GOSSIP_PROMPT_PASSWORD_SHA256",
       previousPasswordHash,
     );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_BASE64", previousEncodedPrompts);
     restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
   }
 });
