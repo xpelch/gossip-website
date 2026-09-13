@@ -3,6 +3,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 const PROMPT_NAMES = ["general", "grok", "hermes", "openclaw"];
 const MAX_PASSWORD_LENGTH = 256;
 const MAX_PROMPT_CONFIGURATION_BYTES = 64 * 1024;
+const ETHEREUM_ADDRESS_PATTERN = /^0x[0-9a-f]{40}$/iu;
 
 function sendJson(response, status, body) {
   response.setHeader("Cache-Control", "no-store");
@@ -33,10 +34,19 @@ function passwordMatchesHash(password, expectedHash) {
     return false;
   }
 
-  const actualBytes = createHash("sha256").update(password).digest();
+  const normalizedPassword = normalizeAddressPassword(password);
+  const actualBytes = createHash("sha256").update(normalizedPassword).digest();
   const expectedBytes = Buffer.from(expectedHash, "hex");
 
   return timingSafeEqual(actualBytes, expectedBytes);
+}
+
+function normalizeAddressPassword(password) {
+  const trimmedPassword = password.trim();
+
+  return ETHEREUM_ADDRESS_PATTERN.test(trimmedPassword)
+    ? trimmedPassword.toLowerCase()
+    : password;
 }
 
 function parsePrompts(serializedPrompts) {
