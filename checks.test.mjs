@@ -661,6 +661,7 @@ test("preview serves only the public allowlist with restrictive headers", async 
       PORT: "0",
       GOSSIP_PROMPT_PASSWORD_SHA256:
         "a14aa70bc9c1e3b42ea93b56b895f9b0e329d2787277e8acf14c01ac4cb99804",
+      GOSSIP_PROMPTS_BASE64: "",
       GOSSIP_PROMPTS_JSON: JSON.stringify(protectedPromptFixture),
     },
     stdio: ["ignore", "pipe", "pipe"],
