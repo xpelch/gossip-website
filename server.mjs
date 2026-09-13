@@ -1,6 +1,8 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 
+import setupPrompt from "./api/setup-prompt.js";
+
 const publicRoot = new URL("./public/", import.meta.url);
 const files = new Map([
   ["/", ["index.html", "text/html"]],
@@ -41,15 +43,57 @@ const textMimeTypes = new Set([
   "image/svg+xml",
 ]);
 const port = Number(process.env.PORT || 43848);
+
+function createApiResponse(response) {
+  return {
+    setHeader(name, value) {
+      response.setHeader(name, value);
+    },
+    status(statusCode) {
+      response.statusCode = statusCode;
+      return this;
+    },
+    json(body) {
+      response.end(JSON.stringify(body));
+    },
+  };
+}
+
+async function readJsonBody(request) {
+  const chunks = [];
+  let length = 0;
+
+  for await (const chunk of request) {
+    length += chunk.length;
+    if (length > 1024) {
+      return null;
+    }
+    chunks.push(chunk);
+  }
+
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    return null;
+  }
+}
+
 const server = createServer(async (request, response) => {
   response.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
+    "default-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'",
   );
   response.setHeader("X-Content-Type-Options", "nosniff");
   response.setHeader("Referrer-Policy", "no-referrer");
   response.setHeader("Cache-Control", "no-store");
-  const file = files.get(new URL(request.url, "http://localhost").pathname);
+  const pathname = new URL(request.url, "http://localhost").pathname;
+  if (pathname === "/api/setup-prompt") {
+    request.body = await readJsonBody(request);
+    setupPrompt(request, createApiResponse(response));
+    return;
+  }
+
+  const file = files.get(pathname);
   if (!file || !["GET", "HEAD"].includes(request.method)) {
     response.writeHead(404).end("Not found");
     return;

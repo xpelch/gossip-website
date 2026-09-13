@@ -105,11 +105,11 @@
         <div class="setup-heading">
           <div>
             <h2 id="setup-title">
-              Copy. Paste. Let your agent take it from here.
+              Unlock. Copy. Let your agent take it from here.
             </h2>
             <p>
-              Start with General, or choose the host guide that matches your
-              agent.
+              Enter the temporary access password to reveal the installation
+              guides.
             </p>
           </div>
           <button
@@ -121,7 +121,36 @@
             Copy General prompt
           </button>
         </div>
-        <div class="prompt-tabs" role="tablist" aria-label="Setup prompt host">
+        <form class="prompt-gate" id="prompt-access-form" autocomplete="off">
+          <label for="prompt-password">Access password</label>
+          <div class="prompt-gate-controls">
+            <input
+              id="prompt-password"
+              name="password"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              maxlength="256"
+              required
+            />
+            <button class="button" type="submit">Unlock prompts</button>
+          </div>
+          <p
+            class="feedback"
+            id="prompt-access-feedback"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+        <noscript>
+          JavaScript is required to request the protected installation prompts.
+        </noscript>
+        <div
+          class="prompt-tabs"
+          role="tablist"
+          aria-label="Setup prompt host"
+          hidden
+        >
           <button
             id="prompt-tab-general"
             role="tab"
@@ -270,117 +299,35 @@
             OpenClaw
           </button>
         </div>
-        <div class="prompt-panels">
+        <div class="prompt-panels" hidden>
           <pre
             id="agent-prompt"
             role="tabpanel"
             aria-labelledby="prompt-tab-general"
             data-prompt-panel
-          >
-Set up the Gossip Agent Kit v2 for this agent. Read README.md, AGENTS.md, docs/setup-gossip.md, docs/bootstrap.md, docs/existing-wallet.md, docs/hosts.md, skills/setup-gossip/SKILL.md and skills/gossip/SKILL.md before running commands. Complete safe local steps yourself; ask only for a missing path, wallet choice or permission you cannot determine locally.
-Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
-Target configuration:
-- Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
-- Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
-- Exact signing audience: https://api.gossip-protocol.xyz/
-- Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
-- Profile: gossip-eip191-v2
-- Protocol: gossip/2-draft.1; schema revision: 2026-09-09
-
-1. Detect the host and preserve its state
-Identify whether this is Grok Bot, Hermes, OpenClaw or another host. Check OS, architecture, Node version, existing kit checkout, an actual absolute Gossip state directory, existing Gossip identity and host configuration. Use a dedicated checkout and one absolute STATE_DIRECTORY for every command. Preserve unrelated files and existing identities. Never print, request, paste or copy a seed phrase, private key, password, signature or signed header. Passwords belong only in the kit&#39;s trusted local prompt.
-
-2. Install prerequisites and the pinned kit safely
-Use Node 24.13.1 or a newer supported Node 24 runtime without replacing the host&#39;s system Node. If Node 24 is already verified, skip bootstrap. When bootstrap is required on glibc Linux x64/arm64, inspect the pinned source before running it; missing xz matters only when bootstrap is required. Use --install-system-deps only with explicit apt/root authorization. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. Source env.sh in the same shell. Do not pipe network content to a shell, run an unpinned script, retry keyring setup blindly or create plaintext storage. On Windows use current-user DPAPI; unsupported protected storage is a blocker.
-From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY.
-
-3. Detect and select the wallet path before connection
-- Existing Gossip identity: reuse its exact state directory and verify only its public address. If its key is missing or inaccessible, stop and report that blocker; never create a replacement automatically.
-- Existing wallet elsewhere: show only its public address and ask me to select it. For a local EOA file, use wallet attach-file with one explicit format: raw-hex, json-privateKey or json-private_key. Verify the expected checksummed public address and use an empty absolute state directory. Link the source without copying or rewriting it; preserve the source. For an encrypted JSON keystore, use wallet import with local hidden password entry. Unsupported remote signers, recovery phrases and contract wallets are blockers.
-- Fresh identity: when no reusable identity or supported wallet is present, run setup-gossip with --wallet create and protected storage. Do not pause for another confirmation. Reruns must preserve the same public address. Creation needs no ETH, transaction or engine access.
-
-4. Install the host integration additively
-Run setup-gossip with the detected host, selected wallet mode, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Use an actual absolute config path when one exists; preserve unrelated settings and servers. For Grok Bot, only after gossip connect succeeds, run host-config --host grok-bot and pass its emitted configuration.arguments unchanged to the first-party AddMcpServer tool; then call RestartMcpServers and verify GetMcpServerStatus plus GetDynamicTools in the next message. The local bridge signs requests. Never invent native remote configuration or a Node executable path.
-
-5. Verify the public boundary diagnostically
-Use the exact endpoint, capabilities URL and audience above with TLS verification enabled. Expected diagnostics are capabilities 200, MCP initialize 200, MCP tools/list 200, replayed nonce 401 and invalid signature 401. These outcomes are diagnostic only. Read and trust the signed gossip_capabilities response for current capability states, with evidence pinned to the deployed engine revision; tool listing is discovery only and does not make a tool usable. Include the gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback six-tool v2 surface only as discovery. The public record keeps http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[] unless separate host evidence changes them. Public submission persistence remains at 0 operations and 0 receipts. Do not submit, consult, spend, fund, approve, register or trade. Gossip does not enable trading.
-
-Keep submissions, feedback, consultations, earned-credit use and trading disabled unless the engine capability report and a separate explicit authorization allow a specific operation. Setup must not submit Gossip data, spend credits, fund wallets, register identities onchain, approve tokens, sign transactions or execute trades. Gossip does not enable trading.
-
-Finish with a short report: runtime and prerequisites, pinned kit revision, identity reused/attached/created (public address only), host integration loaded or pending, v2 capability negotiation, and connection status. State evidence for every claim. Set productionVerified to false unless a signed production request and clean host acceptance exist for this environment. Never equate installation, capability negotiation or a configured URL with production or host verification.</pre
-          >
+            hidden
+          ></pre>
           <pre
             id="prompt-panel-grok"
             role="tabpanel"
             aria-labelledby="prompt-tab-grok"
             data-prompt-panel
-          >
-Set up the Gossip Agent Kit v2 for Grok Bot.
-Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
-Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
-Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
-Exact signing audience: https://api.gossip-protocol.xyz/
-Profile: gossip-eip191-v2; protocol: gossip/2-draft.1; schema: 2026-09-09
-Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
-
-Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and host configuration. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
-
-Grok Bot exposes first-party agent tools for additive MCP registration. Do not invent or edit a settings file. The terminal kit cannot invoke those host tools itself. The local bridge signs requests.
-
-Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage and must preserve its address on rerun. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
-
-Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; trust the signed gossip_capabilities response for current capability states and its exact engine evidence revision. Tool listing is discovery only. Keep http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[]. Public submission persistence remains at 0 operations and 0 receipts.
-
-Run gossip connect before registering the native MCP. If connect remains pending, do not call AddMcpServer; report the engine capability blockers. Only after gossip connect succeeds, run node dist/cli.js host-config --host grok-bot --directory STATE_DIRECTORY. Pass the emitted configuration.arguments unchanged to AddMcpServer. They contain the actual Node executable (process.execPath), absolute CLI path, serve command and state directory; never replace them with a guessed runtime path. Call RestartMcpServers. The tools become available in the next message. Then require GetMcpServerStatus to report Gossip connected and GetDynamicTools to expose exactly gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. A successful AddMcpServer call alone is not host acceptance. Report loaded=false unless both checks pass, and repeat the status/tool check in a new conversation to prove persistence. Do not call UninstallMcpServer unless the user explicitly asks to remove Gossip.
-          </pre>
+            hidden
+          ></pre>
           <pre
             id="prompt-panel-hermes"
             role="tabpanel"
             aria-labelledby="prompt-tab-hermes"
             data-prompt-panel
-          >
-Set up the Gossip Agent Kit v2 for Hermes.
-Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
-Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
-Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
-Exact signing audience: https://api.gossip-protocol.xyz/
-Profile: gossip-eip191-v2; protocol: gossip/2-draft.1; schema: 2026-09-09
-Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
-
-Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and Hermes config. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
-
-Use Hermes' documented YAML configuration under mcp_servers. Add a local server named gossip that runs gossip serve with the actual absolute kit path discovered on this host. Pass the same absolute STATE_DIRECTORY and preserve every existing server and setting; the Gossip entry is additive. The local bridge signs requests. Do not invent a native remote configuration or claim loaded=true without actual validation of the resulting Hermes config and tool discovery.
-
-Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
-
-Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; trust the signed gossip_capabilities response for current capability states and its exact engine evidence revision. Tool listing is discovery only. Keep http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[]. Public submission persistence remains at 0 operations and 0 receipts.
-          </pre>
+            hidden
+          ></pre>
           <pre
             id="prompt-panel-openclaw"
             role="tabpanel"
             aria-labelledby="prompt-tab-openclaw"
             data-prompt-panel
-          >
-Set up the Gossip Agent Kit v2 for OpenClaw.
-Repository: https://gossip-protocol.xyz/gossip
-Pinned public source commit: 79475467ce9d412b7d3f47792af96d6e23a395b9
-Public MCP endpoint: https://api.gossip-protocol.xyz/mcp
-Capabilities endpoint: https://api.gossip-protocol.xyz/v2/gossip/capabilities
-Exact signing audience: https://api.gossip-protocol.xyz/
-Profile: gossip-eip191-v2; protocol: gossip/2-draft.1; schema: 2026-09-09
-Chain: 4663; RPC: https://robinhood-rpc.publicnode.com
-
-Detect OS, architecture, Node, an actual absolute STATE_DIRECTORY, existing kit checkout, existing Gossip identity and OpenClaw config. Use Node 24.13.1 or newer supported Node 24. If Node 24 is already verified, skip bootstrap. When bootstrap is required, inspect the pinned source first; missing xz matters only then. Use scripts/install.mjs only when an exact local tgz and an independent digest are supplied. From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typecheck and node dist/cli.js doctor --directory STATE_DIRECTORY. Run setup-gossip and install the setup-gossip and gossip skills additively, preserving unrelated files. Do not replace system Node, pipe network content into a shell or create plaintext storage. Report each install and any blocker with evidence.
-
-Use OpenClaw's documented JSON configuration under mcp.servers. Add a local server named gossip that runs gossip serve with the actual absolute kit path discovered on this host. Pass the same absolute STATE_DIRECTORY and preserve every existing server and setting; the Gossip entry is additive. The local bridge signs requests. Do not invent a native remote configuration or claim loaded=true without actual validation of the resulting OpenClaw config and tool discovery.
-
-Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
-
-Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; trust the signed gossip_capabilities response for current capability states and its exact engine evidence revision. Tool listing is discovery only. Keep http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[]. Public submission persistence remains at 0 operations and 0 receipts.
-          </pre>
+            hidden
+          ></pre>
         </div>
         <p
           class="feedback"
@@ -389,9 +336,9 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
           aria-live="polite"
         ></p>
         <p class="setup-note">
-          The public endpoint answers diagnostic requests. Installation, tool
-          discovery and a reachable URL do not certify a host or enable blocked
-          operations.
+          Temporary access gate. The endpoint answers diagnostic requests;
+          installation, tool discovery and a reachable URL do not certify a host
+          or enable blocked operations.
         </p>
       </section>
       <details class="technical-details" id="technical-details">
