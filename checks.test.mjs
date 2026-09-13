@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
+import { createHash } from "node:crypto";
 
 import setupPrompt from "./api/setup-prompt.js";
 
@@ -387,6 +388,36 @@ test("prompt API returns all prompts only after a valid password", () => {
       result.headers.get("content-type"),
       "application/json; charset=utf-8",
     );
+  } finally {
+    restoreEnvironmentVariable(
+      "GOSSIP_PROMPT_PASSWORD_SHA256",
+      previousPasswordHash,
+    );
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_BASE64", previousEncodedPrompts);
+    restoreEnvironmentVariable("GOSSIP_PROMPTS_JSON", previousPrompts);
+  }
+});
+
+test("prompt API treats an Ethereum address password as case-insensitive", () => {
+  const previousPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
+  const previousEncodedPrompts = process.env.GOSSIP_PROMPTS_BASE64;
+  const previousPrompts = process.env.GOSSIP_PROMPTS_JSON;
+  const normalizedAddress = "0x575c48cfac7105fc598e37274bc1d153f896069f";
+  process.env.GOSSIP_PROMPT_PASSWORD_SHA256 = createHash("sha256")
+    .update(normalizedAddress)
+    .digest("hex");
+  delete process.env.GOSSIP_PROMPTS_BASE64;
+  process.env.GOSSIP_PROMPTS_JSON = JSON.stringify(protectedPromptFixture);
+
+  try {
+    const result = invokeSetupPrompt({
+      body: {
+        password: "  0x575C48cFAc7105FC598E37274Bc1d153F896069f  ",
+      },
+    });
+
+    assert.equal(result.statusCode, 200);
+    assert.deepEqual(result.body, { prompts: protectedPromptFixture });
   } finally {
     restoreEnvironmentVariable(
       "GOSSIP_PROMPT_PASSWORD_SHA256",
