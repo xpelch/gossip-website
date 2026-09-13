@@ -2,6 +2,7 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 const PROMPT_NAMES = ["general", "grok", "hermes", "openclaw"];
 const MAX_PASSWORD_LENGTH = 256;
+const MAX_PROMPT_CONFIGURATION_BYTES = 64 * 1024;
 
 function sendJson(response, status, body) {
   response.setHeader("Cache-Control", "no-store");
@@ -51,6 +52,24 @@ function parsePrompts(serializedPrompts) {
   }
 }
 
+function readPromptConfiguration() {
+  const encodedPrompts = process.env.GOSSIP_PROMPTS_BASE64;
+  if (encodedPrompts) {
+    try {
+      const decoded = Buffer.from(encodedPrompts, "base64");
+      const isCanonicalBase64 =
+        decoded.length <= MAX_PROMPT_CONFIGURATION_BYTES &&
+        decoded.toString("base64") === encodedPrompts;
+
+      return isCanonicalBase64 ? decoded.toString("utf8") : null;
+    } catch {
+      return null;
+    }
+  }
+
+  return process.env.GOSSIP_PROMPTS_JSON ?? null;
+}
+
 export default function setupPrompt(request, response) {
   if (request.method !== "POST") {
     response.setHeader("Allow", "POST");
@@ -59,7 +78,7 @@ export default function setupPrompt(request, response) {
   }
 
   const expectedPasswordHash = process.env.GOSSIP_PROMPT_PASSWORD_SHA256;
-  const serializedPrompts = process.env.GOSSIP_PROMPTS_JSON;
+  const serializedPrompts = readPromptConfiguration();
   if (!expectedPasswordHash || !serializedPrompts) {
     sendJson(response, 503, { error: "prompt_access_unavailable" });
     return;
