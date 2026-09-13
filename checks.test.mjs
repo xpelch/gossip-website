@@ -150,9 +150,13 @@ test("Gossip availability exposes the reachable public v2 boundary", async () =>
   assert.equal(availability.audience, "https://api.gossip-protocol.xyz/");
   assert.equal(
     availability.sourceRevision,
-    "6d08cacab6b436c7574f8dfd5b5b8794eb302aeb",
+    "2eddeb5d5f03317f411f8a096ba37085b57f3b5f",
   );
-  assert.equal(availability.diagnosticVerifiedAt, "2026-09-13T03:16:23Z");
+  assert.equal(
+    availability.engineRevision,
+    "rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f",
+  );
+  assert.equal(availability.diagnosticVerifiedAt, "2026-09-13T16:25:47.977Z");
   assert.equal(availability.productionVerified, false);
   assert.equal(availability.hostAcceptanceVerified, false);
   assert.equal(availability.developmentTarget, "http://127.0.0.1:18080/mcp");
@@ -185,16 +189,33 @@ test("Gossip availability exposes the reachable public v2 boundary", async () =>
     ),
     {
       http: "installed",
-      durable_operations: "installed",
-      atomic_consult: "blocked",
-      signed_receipts: "blocked",
-      evidence: "blocked",
+      durable_operations: "verified",
+      atomic_consult: "verified",
+      signed_receipts: "verified",
+      evidence: "verified",
       public_submission: "blocked",
       private_submission: "blocked",
       session_keys: "not_applicable",
       tasks: "not_applicable",
     },
   );
+  for (const feature of availability.features.filter(({ capability }) =>
+    [
+      "atomic_consult",
+      "durable_operations",
+      "signed_receipts",
+      "evidence",
+    ].includes(capability),
+  )) {
+    assert.equal(
+      feature.evidenceRevision,
+      "rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f",
+    );
+  }
+  assert.deepEqual(availability.publicSubmissionPersistence, {
+    operations: 0,
+    receipts: 0,
+  });
   assert.deepEqual(availability.tools, [
     "gossip_capabilities",
     "gossip_consult_v2",
@@ -223,6 +244,14 @@ test("Gossip availability exposes the reachable public v2 boundary", async () =>
   assert.equal(record.authentication, availability.authentication);
   assert.equal(record.wallet_type, availability.walletType);
   assert.equal(record.chain_id, availability.chainId);
+  assert.equal(
+    record.evidence_revision,
+    "rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f",
+  );
+  assert.deepEqual(record.public_submission_persistence, {
+    operations: 0,
+    receipts: 0,
+  });
   assert.equal(record.productionVerified, false);
   assert.equal(record.hostAcceptanceVerified, false);
   assert.match(guide, /gossip-eip191-v2/i);
@@ -258,7 +287,7 @@ test("installation prompt pins the safe Gossip v2 host and wallet flow", async (
     prompt,
     /six-tool v2 surface|gossip_capabilities.*gossip_feedback/u,
   );
-  assert.match(prompt, /Respect each tool's reported capability state/u);
+  assert.match(prompt, /trust the signed gossip_capabilities response/u);
   assert.match(
     prompt,
     /Public MCP endpoint: https:\/\/api\.gossip-protocol\.xyz\/mcp/u,

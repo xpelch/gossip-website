@@ -28,11 +28,12 @@ The current availability record publishes the reachable endpoint
 `https://api.gossip-protocol.xyz/mcp`, capabilities endpoint
 `https://api.gossip-protocol.xyz/v2/gossip/capabilities`, and exact audience
 `https://api.gossip-protocol.xyz/`. Capabilities, MCP initialize and tools-list
-diagnostics returned 200; replay and invalid-signature diagnostics returned
-401. These outcomes do not verify production or a host. The record keeps
-`productionVerified` and `hostAcceptanceVerified` false, with HTTP and
-durable operations installed, consultations/receipts/evidence/submissions
-blocked, and session/tasks not applicable.
+diagnostics returned 200; replay and invalid-signature diagnostics returned 401. These outcomes do not verify production or a host. The record keeps
+`productionVerified` and `hostAcceptanceVerified` false, with HTTP installed,
+atomic consultation/durable operations/signed receipts/evidence verified against
+the deployed engine evidence revision, public and private submissions blocked,
+and session/tasks not applicable. The submission persistence check found 0
+operations and 0 receipts.
 
 ## Local checks
 

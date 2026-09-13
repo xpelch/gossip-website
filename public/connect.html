@@ -193,12 +193,11 @@ From the pinned checkout run npm ci --ignore-scripts, npm run build, npm run typ
 Run setup-gossip with the detected host, selected wallet mode, --profile gossip-eip191-v2 and the same --directory STATE_DIRECTORY. Use an actual absolute config path when one exists; preserve unrelated settings and servers. For Grok Bot, only after gossip connect succeeds, run host-config --host grok-bot and pass its emitted configuration.arguments unchanged to the first-party AddMcpServer tool; then call RestartMcpServers and verify GetMcpServerStatus plus GetDynamicTools in the next message. The local bridge signs requests. Never invent native remote configuration or a Node executable path.
 
 5. Verify the public boundary diagnostically
-Use the exact endpoint, capabilities URL and audience above with TLS verification enabled. Expected diagnostics are capabilities 200, MCP initialize 200, MCP tools/list 200, replayed nonce 401 and invalid signature 401. These outcomes are diagnostic only. Tool listing is discovery only and does not make a tool usable; Respect each tool's reported capability state. Include the gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback six-tool v2 surface only as discovery. The public record keeps http and durable_operations installed; atomic_consult, signed_receipts, evidence, public_submission and private_submission blocked; session_keys and tasks not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[] unless separate evidence changes them. Do not submit, consult, spend, fund, approve, register or trade. Gossip does not enable trading.
+Use the exact endpoint, capabilities URL and audience above with TLS verification enabled. Expected diagnostics are capabilities 200, MCP initialize 200, MCP tools/list 200, replayed nonce 401 and invalid signature 401. These outcomes are diagnostic only. Read and trust the signed gossip_capabilities response for current capability states, with evidence pinned to the deployed engine revision; tool listing is discovery only and does not make a tool usable. Include the gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback six-tool v2 surface only as discovery. The public record keeps http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[] unless separate host evidence changes them. Public submission persistence remains at 0 operations and 0 receipts. Do not submit, consult, spend, fund, approve, register or trade. Gossip does not enable trading.
 
 Keep submissions, feedback, consultations, earned-credit use and trading disabled unless the engine capability report and a separate explicit authorization allow a specific operation. Setup must not submit Gossip data, spend credits, fund wallets, register identities onchain, approve tokens, sign transactions or execute trades. Gossip does not enable trading.
 
-Finish with a short report: runtime and prerequisites, pinned kit revision, identity reused/attached/created (public address only), host integration loaded or pending, v2 capability negotiation, and connection status. State evidence for every claim. Set productionVerified to false unless a signed production request and clean host acceptance exist for this environment. Never equate installation, capability negotiation or a configured URL with production or host verification.</pre
-          >
+Finish with a short report: runtime and prerequisites, pinned kit revision, identity reused/attached/created (public address only), host integration loaded or pending, v2 capability negotiation, and connection status. State evidence for every claim. Set productionVerified to false unless a signed production request and clean host acceptance exist for this environment. Never equate installation, capability negotiation or a configured URL with production or host verification.</pre>
           <pre
             id="prompt-panel-grok"
             role="tabpanel"
@@ -220,7 +219,7 @@ Grok Bot exposes first-party agent tools for additive MCP registration. Do not i
 
 Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage and must preserve its address on rerun. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
 
-Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; tool listing is discovery only. Keep http and durable_operations installed; atomic_consult, signed_receipts, evidence, public_submission and private_submission blocked; session_keys and tasks not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[].
+Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; trust the signed gossip_capabilities response for current capability states and its exact engine evidence revision. Tool listing is discovery only. Keep http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[]. Public submission persistence remains at 0 operations and 0 receipts.
 
 Run gossip connect before registering the native MCP. If connect remains pending, do not call AddMcpServer; report the engine capability blockers. Only after gossip connect succeeds, run node dist/cli.js host-config --host grok-bot --directory STATE_DIRECTORY. Pass the emitted configuration.arguments unchanged to AddMcpServer. They contain the actual Node executable (process.execPath), absolute CLI path, serve command and state directory; never replace them with a guessed runtime path. Call RestartMcpServers. The tools become available in the next message. Then require GetMcpServerStatus to report Gossip connected and GetDynamicTools to expose exactly gossip_capabilities, gossip_consult_v2, gossip_submit_v2, gossip_operation, gossip_receipt_v2 and gossip_feedback. A successful AddMcpServer call alone is not host acceptance. Report loaded=false unless both checks pass, and repeat the status/tool check in a new conversation to prove persistence. Do not call UninstallMcpServer unless the user explicitly asks to remove Gossip.
           </pre>
@@ -245,7 +244,7 @@ Use Hermes' documented YAML configuration under mcp_servers. Add a local server 
 
 Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
 
-Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; tool listing is discovery only. Keep http and durable_operations installed; atomic_consult, signed_receipts, evidence, public_submission and private_submission blocked; session_keys and tasks not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[].
+Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; trust the signed gossip_capabilities response for current capability states and its exact engine evidence revision. Tool listing is discovery only. Keep http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[]. Public submission persistence remains at 0 operations and 0 receipts.
           </pre>
           <pre
             id="prompt-panel-openclaw"
@@ -268,7 +267,7 @@ Use OpenClaw's documented JSON configuration under mcp.servers. Add a local serv
 
 Reuse an existing Gossip identity and verify only its public address. For a common EOA file, wallet attach-file supports exactly raw-hex, json-privateKey or json-private_key; verify the checksummed public address, link the source without copying it and preserve the source. Encrypted JSON keystores use local hidden password entry. A fresh identity uses --wallet create with protected storage. Never expose secrets. Do not submit, consult, spend, fund, approve, register or trade.
 
-Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; tool listing is discovery only. Keep http and durable_operations installed; atomic_consult, signed_receipts, evidence, public_submission and private_submission blocked; session_keys and tasks not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[].
+Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, replay 401, invalid signature 401. Diagnostic only; trust the signed gossip_capabilities response for current capability states and its exact engine evidence revision. Tool listing is discovery only. Keep http installed; atomic_consult, durable_operations, signed_receipts and evidence are verified by live capability evidence; public_submission and private_submission remain blocked; session_keys and tasks are not_applicable. Keep productionVerified=false, hostAcceptanceVerified=false and supportedClients=[]. Public submission persistence remains at 0 operations and 0 receipts.
           </pre>
         </div>
         <p
@@ -302,9 +301,9 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
               <h2>One connection. Six tools.</h2>
               <p>
                 MCP and Gossip v2 are integrated in the engine. The public
-                endpoint is reachable for the diagnostic checks below.
-                Capability states and host acceptance remain explicit release
-                gates.
+                endpoint passed the diagnostic checks below. Capability states
+                come from the signed live <code>gossip_capabilities</code>
+                response and host acceptance remains an explicit release gate.
               </p>
               <pre id="connection-record">
 {
@@ -332,20 +331,21 @@ Expected diagnostics: capabilities 200, MCP initialize 200, MCP tools/list 200, 
   },
   "features": {
     "http": "installed",
-    "durable_operations": "installed",
-    "atomic_consult": "blocked",
-    "signed_receipts": "blocked",
-    "evidence": "blocked",
+    "durable_operations": "verified",
+    "atomic_consult": "verified",
+    "signed_receipts": "verified",
+    "evidence": "verified",
     "public_submission": "blocked",
     "private_submission": "blocked",
     "session_keys": "not_applicable",
     "tasks": "not_applicable"
   },
+  "evidence_revision": "rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f",
+  "public_submission_persistence": { "operations": 0, "receipts": 0 },
   "supportedClients": [],
   "productionVerified": false,
   "hostAcceptanceVerified": false
-}</pre
-              >
+}</pre>
               <div class="copy-row">
                 <button class="button" data-copy="connection-record" hidden>
                   Copy connection details
@@ -471,8 +471,7 @@ Gossip v2 request
 {exact raw target}
 {lowercase SHA256 hex body}
 {canonical UUID nonce}
-{expires as Unix seconds}</pre
-              >
+{expires as Unix seconds}</pre>
               <p class="note">
                 The v2 profile and proof headers are engine protocol
                 identifiers. Use the versioned kit specification for the exact
@@ -514,7 +513,7 @@ Gossip v2 request
               <p>
                 Use the
                 <a
-                  href="https://github.com/xpelch/sherwood/blob/db968f5010b9491b67190aff749d62f2ad0e7a97/docs/adr/0020-gossip-v2-mcp-authentication.md"
+                  href="https://github.com/xpelch/sherwood/blob/main/docs/adr/0020-gossip-v2-mcp-authentication.md"
                   >v2 signing and transport reference</a
                 >
                 for the exact EIP-191 envelope. Never paste a seed phrase or
@@ -601,7 +600,7 @@ Gossip v2 request
               </p>
               <a
                 class="text-link"
-                href="https://github.com/xpelch/sherwood/blob/db968f5010b9491b67190aff749d62f2ad0e7a97/docs/adr/0020-gossip-v2-mcp-authentication.md"
+                href="https://github.com/xpelch/sherwood/blob/main/docs/adr/0020-gossip-v2-mcp-authentication.md"
                 >Read Gossip v2 transport
                 <svg class="arrow-icon" viewBox="0 0 20 20" aria-hidden="true">
                   <path d="M4 16 16 4M4 4h12v12" /></svg
@@ -715,9 +714,11 @@ Gossip v2 request
                 revoke server-side access.
               </p>
               <p class="note">
-                Engine source revision db968f50 is deployed. No signed
-                production request, clean host acceptance or server revocation
-                test was performed in this website delivery.
+                Engine source revision
+                rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f is deployed and
+                live capability evidence was accepted at
+                2026-09-13T16:25:47.977Z. No clean host acceptance or server
+                revocation test was performed in this website delivery.
               </p>
             </section>
           </div>

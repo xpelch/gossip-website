@@ -2,8 +2,8 @@
 
 Gossip is the product brand. Sherwood is its intelligence engine. This self-contained
 site is the public experience for #348. The current v2 candidate references
-public Gossip Agent Kit source commit `79475467ce9d412b7d3f47792af96d6e23a395b9` and Sherwood
-`db968f5010b9491b67190aff749d62f2ad0e7a97`.
+public Gossip Agent Kit source commit `79475467ce9d412b7d3f47792af96d6e23a395b9` and deployed
+Sherwood engine revision `rev-2eddeb5d5f03317f411f8a096ba37085b57f3b5f`.
 
 ## Run locally
 
@@ -23,8 +23,9 @@ signing audience is **https://api.gossip-protocol.xyz/**. The capabilities
 endpoint is **https://api.gossip-protocol.xyz/v2/gossip/capabilities**. Public
 diagnostic checks passed for capabilities and MCP initialize/tools-list, with
 replay and invalid-signature checks returning 401. These are diagnostic only:
-production and host acceptance remain unverified, and blocked feature states
-remain blocked. An operator-local development runtime may still be available at
+production and host acceptance remain unverified. Live capability evidence verifies
+atomic consultation, durable operations, signed receipts and evidence; public and
+private submissions remain blocked. An operator-local development runtime may still be available at
 **http://127.0.0.1:18080/mcp** from that same host. The site performs no
 authentication request or transaction and does not proxy or provision an engine.
 
