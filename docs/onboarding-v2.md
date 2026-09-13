@@ -7,8 +7,8 @@ the current setup contract. The current copy-paste setup prompt is in
 in [`public/availability.json`](../public/availability.json).
 
 The current candidate uses Gossip Agent Kit
-`c59421f00c2678d66c14d98fd32a5e7e82144415`, artifact SHA-256
-`b90cae8811327230a314e42f2b7bfb0b48c68a96eb66a57c3c3c27c8e2be0d89`,
+`ba360730e872534270ed54b3690a3c60b47c52cc`, artifact SHA-256
+`e73f5bb2c17a1d5f184acf6a7f39b995ef5aee2cc5956790aecb93cedd8a2b5a`,
 Sherwood `db968f5010b9491b67190aff749d62f2ad0e7a97`, endpoint
 `https://engine-production-c4d8.up.railway.app/mcp`, and audience
 `https://engine-production-c4d8.up.railway.app/`. Production and host acceptance
